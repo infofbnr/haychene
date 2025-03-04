@@ -9,9 +9,19 @@ async function loadGossip() {
     gossipList.innerHTML = "";
 
     data.reverse().forEach(item => {
+        let div = document.createElement("div");
+        div.classList.add("gossip-card");
+
         let p = document.createElement("p");
-        p.textContent = `${item.gossip} (Posted on ${new Date(item.timestamp).toLocaleString()})`;
-        gossipList.appendChild(p);
+        p.textContent = item.gossip;
+
+        let timestamp = document.createElement("div");
+        timestamp.classList.add("timestamp");
+        timestamp.textContent = `Posted on ${new Date(item.timestamp).toLocaleString()}`;
+
+        div.appendChild(p);
+        div.appendChild(timestamp);
+        gossipList.appendChild(div);
     });
 }
 
