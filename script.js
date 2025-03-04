@@ -1,4 +1,4 @@
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbw3PqbZ106ANWlrd9rguBLphcfzDEbvsKUaSXzsBqGOyCR5lMm0GV_XckQJ0NvqmHIXrA/exec"; // Replace with your Apps Script Web App URL
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyGvMCfdZz_x35BmlZvq9PckLv5gXaQF2MrRsEDgrEceTF7pyw9-jAiwibVh1Fr5ncMcA/exec"; // Replace with your Apps Script Web App URL
 
 // Fetch gossip posts from Google Sheets
 async function loadGossip() {
