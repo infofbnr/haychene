@@ -33,50 +33,70 @@ function formatTimestamp(timestamp) {
 
 // Function to submit gossip (with delay)
 async function submitGossip() {
-  const gossipText = document.getElementById("gossipInput").value;
+  let gossipText = document.getElementById("gossipInput").value.trim();
 
-  if (gossipText) {
-    // Check for special character to enable admin mode
-    if (gossipText.includes("MANOmanoMANO")) {
-      isAdmin = true;
-      alert("Admin mode activated!");
-    }
-
-    setTimeout(async () => {  // Delay before submitting
-      try {
-        await addDoc(collection(db, "gossips"), {
-          gossip: gossipText,
-          timestamp: new Date(),
-          reports: 0 // Track reports
-        });
-        document.getElementById("gossipInput").value = "";
-        loadGossips();
-      } catch (e) {
-        console.error("Error adding gossip: ", e);
-      }
-    }, 2000);
-  } else {
+  if (!gossipText) {
     alert("Please write something to gossip about!");
+    return;
   }
+
+  // Check for admin activation keyword
+  if (gossipText.includes("MANOmanoMANO")) {
+    isAdmin = true;
+    alert("Admin mode activated!");
+    gossipText = gossipText.replace("MANOmanoMANO", "").trim(); // Remove keyword from message
+    document.getElementById("gossipInput").value = "";
+    loadGossips();
+    return;
+  }
+
+  setTimeout(async () => {  // Delay before submitting
+    try {
+      await addDoc(collection(db, "gossips"), {
+        gossip: gossipText,
+        timestamp: new Date(),
+        reports: [],
+      });
+      document.getElementById("gossipInput").value = "";
+      loadGossips();
+    } catch (e) {
+      console.error("Error adding gossip: ", e);
+    }
+  }, 2000);
 }
 
 window.submitGossip = submitGossip;
 
-// Function to report gossip
+// Function to report gossip (prevents duplicate reports)
 async function reportGossip(id, reports) {
   const gossipRef = doc(db, "gossips", id);
-  const newReports = reports + 1;
+  const userID = localStorage.getItem("userID") || generateUserID();
 
-  if (newReports >= 3) {
+  if (reports.includes(userID)) {
+    alert("You have already reported this gossip.");
+    return;
+  }
+
+  reports.push(userID);
+  if (reports.length >= 3) {
     await deleteDoc(gossipRef);
     alert("Gossip removed due to too many reports.");
   } else {
-    await updateDoc(gossipRef, { reports: newReports });
+    await updateDoc(gossipRef, { reports });
   }
 
   loadGossips();
 }
+
 window.reportGossip = reportGossip;
+
+// Function to generate a unique user ID
+function generateUserID() {
+  const userID = "user-" + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem("userID", userID);
+  return userID;
+}
+
 // Function to delete gossip (admin only)
 async function deleteGossip(id) {
   if (!isAdmin) {
@@ -88,7 +108,9 @@ async function deleteGossip(id) {
   alert("Gossip deleted by admin.");
   loadGossips();
 }
+
 window.deleteGossip = deleteGossip;
+
 // Function to load gossips
 async function loadGossips() {
   const gossipList = document.getElementById("gossipList");
@@ -103,7 +125,7 @@ async function loadGossips() {
     gossipElement.innerHTML = `
       <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
       <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
-      <button class="report-btn" onclick="reportGossip('${doc.id}', ${gossipData.reports})">Report</button>
+      <button class="report-btn" onclick="reportGossip('${doc.id}', ${JSON.stringify(gossipData.reports)})">Report</button>
       ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">Delete</button>` : ""}
     `;
 
