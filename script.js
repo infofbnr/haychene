@@ -34,35 +34,34 @@ function formatTimestamp(timestamp) {
 // Function to submit gossip
 async function submitGossip() {
   let gossipText = document.getElementById("gossipInput").value.trim();
+  let postButton = document.querySelector("button");
 
   if (!gossipText) {
     alert("Please write something to gossip about!");
     return;
   }
 
-  // Activate admin mode if keyword is detected
-  if (gossipText.includes("MANOmanoMANO")) {
-    isAdmin = true;
-    localStorage.setItem("isAdmin", "true"); // Store admin status in local storage
-    alert("Admin mode activated!");
-    gossipText = gossipText.replace("MANOmanoMANO", "").trim(); // Remove keyword from message
-    document.getElementById("gossipInput").value = "";
-    loadGossips(); // Reload to show delete buttons
-    return;
-  }
+  // Disable button to prevent spam
+  postButton.disabled = true;
+  postButton.textContent = "Posting...";
 
   setTimeout(async () => {
     try {
       await addDoc(collection(db, "gossips"), {
         gossip: gossipText,
         timestamp: new Date(),
-        reports: [] // Ensure it's stored as an array
+        reports: []
       });
       document.getElementById("gossipInput").value = "";
       loadGossips();
     } catch (e) {
       console.error("Error adding gossip: ", e);
+      alert("Failed to post gossip. Try again.");
     }
+
+    // Re-enable button after completion
+    postButton.disabled = false;
+    postButton.textContent = "Post";
   }, 2000);
 }
 
