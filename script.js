@@ -33,19 +33,18 @@ function formatTimestamp(timestamp) {
 
 // Function to submit gossip
 async function submitGossip() {
-  let gossipText = document.getElementById("gossipInput").value.trim();
-  let postButton = document.querySelector("button");
-
-  if (!gossipText) {
-    alert("Please write something to gossip about!");
-    return;
-  }
-
-  // Disable button to prevent spam
-  postButton.disabled = true;
-  postButton.textContent = "Posting...";
-
-  setTimeout(async () => {
+    let gossipText = document.getElementById("gossipInput").value.trim();
+    let postButton = document.querySelector("button");
+  
+    if (!gossipText) {
+      alert("Please write something to gossip about!");
+      return;
+    }
+  
+    // Disable button to prevent spam
+    postButton.disabled = true;
+    postButton.textContent = "Posting...";
+  
     try {
       await addDoc(collection(db, "gossips"), {
         gossip: gossipText,
@@ -58,13 +57,12 @@ async function submitGossip() {
       console.error("Error adding gossip: ", e);
       alert("Failed to post gossip. Try again.");
     }
-
+  
     // Re-enable button after completion
     postButton.disabled = false;
     postButton.textContent = "Post";
-  }, 2000);
-}
-
+  }
+  
 // Function to report gossip
 async function reportGossip(id, reports = []) {
   const gossipRef = doc(db, "gossips", id);
