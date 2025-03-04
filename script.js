@@ -66,8 +66,6 @@ async function submitGossip() {
   }, 2000);
 }
 
-window.submitGossip = submitGossip;
-
 // Function to report gossip
 async function reportGossip(id, reports = []) {
   const gossipRef = doc(db, "gossips", id);
@@ -91,8 +89,6 @@ async function reportGossip(id, reports = []) {
   loadGossips();
 }
 
-window.reportGossip = reportGossip;
-
 // Generate a unique user ID
 function generateUserID() {
   const userID = "user-" + Math.random().toString(36).substr(2, 9);
@@ -111,8 +107,6 @@ async function deleteGossip(id) {
   alert("Gossip deleted by admin.");
   loadGossips();
 }
-
-window.deleteGossip = deleteGossip;
 
 // Function to load gossips
 async function loadGossips() {
@@ -138,6 +132,14 @@ async function loadGossips() {
     gossipList.appendChild(gossipElement);
   });
 }
+// Ensure the functions are globally accessible
+window.submitGossip = submitGossip;
+window.deleteGossip = deleteGossip;
+window.reportGossip = reportGossip;
 
 // Load gossips on page load
-loadGossips();
+
+document.addEventListener("DOMContentLoaded", () => {
+  isAdmin = localStorage.getItem("isAdmin") === "true"; 
+  loadGossips();
+});
