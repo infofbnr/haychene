@@ -3,9 +3,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-  
-  body {
+}
+
+body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f5f5f5;
     color: #333;
@@ -16,27 +16,29 @@
     min-height: 100vh;
     text-align: center;
     padding: 0 20px;
-  }
-  
-  h1 {
+}
+
+h1 {
     font-size: 3rem;
     margin-bottom: 20px;
     color: #2c3e50;
     font-weight: bold;
-  }
-  h3 {
+}
+
+h3 {
     font-size: 1rem;
     margin-bottom: 20px;
     color: #2c3e50;
     font-weight: bold;
-  }
-  h2 {
+}
+
+h2 {
     font-size: 2rem;
     margin-top: 20px;
     color: #34495e;
-  }
-  
-  textarea {
+}
+
+textarea {
     width: 100%;
     max-width: 500px;
     height: 120px;
@@ -49,14 +51,14 @@
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: border 0.3s ease;
-  }
-  
-  textarea:focus {
+}
+
+textarea:focus {
     outline: none;
     border-color: #2980b9;
-  }
-  
-  button {
+}
+
+button {
     background-color: #3498db;
     color: white;
     font-size: 1.2rem;
@@ -66,19 +68,20 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     width: 150px;
-  }
-  
-  button:hover {
+}
+
+button:hover {
     background-color: #2980b9;
-  }
-  
-  #gossipList {
+}
+
+/* Style for gossip list */
+#gossipList {
     margin-top: 30px;
     width: 100%;
     max-width: 600px;
-  }
-  
-  .gossip {
+}
+
+.gossip {
     background-color: #ffffff;
     border: 1px solid #ecf0f1;
     border-radius: 8px;
@@ -86,31 +89,61 @@
     margin-bottom: 20px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
-  }
-  
-  .gossip:hover {
+    position: relative;
+}
+
+.gossip:hover {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  .gossip p {
+}
+
+.gossip p {
     font-size: 1.1rem;
     color: #34495e;
-  }
-  
-  .timestamp {
+}
+
+.timestamp {
     font-size: 0.9rem;
     color: #7f8c8d;
     margin-top: 12px;
     font-style: italic;
-  }
-  
-  @media (max-width: 600px) {
+}
+
+/* Report and Delete Buttons */
+.report-btn, .delete-btn {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.report-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.report-btn:hover {
+    background-color: #c0392b;
+}
+
+.delete-btn {
+    background-color: #2c3e50;
+    color: white;
+    display: none; /* Only visible to admin */
+}
+
+.delete-btn:hover {
+    background-color: #1a252f;
+}
+
+@media (max-width: 600px) {
     textarea {
-      max-width: 100%;
+        max-width: 100%;
     }
-  
+
     button {
-      width: 100%;
+        width: 100%;
     }
-  }
-  
+}
