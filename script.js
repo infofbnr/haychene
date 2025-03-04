@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let isAdmin = false; // Default: User is NOT an admin
+let isAdmin = localStorage.getItem("isAdmin") === "true"; // Load admin status from storage
 
 // Function to format the timestamp
 function formatTimestamp(timestamp) {
@@ -31,7 +31,7 @@ function formatTimestamp(timestamp) {
   return `${formattedHours}:${formattedMinutes} ${ampm} ${day}/${month}/${year}`;
 }
 
-// Function to submit gossip (with delay)
+// Function to submit gossip
 async function submitGossip() {
   let gossipText = document.getElementById("gossipInput").value.trim();
 
@@ -40,22 +40,23 @@ async function submitGossip() {
     return;
   }
 
-  // Check for admin activation keyword
+  // Activate admin mode if keyword is detected
   if (gossipText.includes("MANOmanoMANO")) {
     isAdmin = true;
+    localStorage.setItem("isAdmin", "true"); // Store admin status in local storage
     alert("Admin mode activated!");
     gossipText = gossipText.replace("MANOmanoMANO", "").trim(); // Remove keyword from message
     document.getElementById("gossipInput").value = "";
-    loadGossips();
+    loadGossips(); // Reload to show delete buttons
     return;
   }
 
-  setTimeout(async () => {  // Delay before submitting
+  setTimeout(async () => {
     try {
       await addDoc(collection(db, "gossips"), {
         gossip: gossipText,
         timestamp: new Date(),
-        reports: [], // Ensure it's stored as an array
+        reports: [] // Ensure it's stored as an array
       });
       document.getElementById("gossipInput").value = "";
       loadGossips();
@@ -67,15 +68,12 @@ async function submitGossip() {
 
 window.submitGossip = submitGossip;
 
-// Function to report gossip (prevents duplicate reports)
+// Function to report gossip
 async function reportGossip(id, reports = []) {
   const gossipRef = doc(db, "gossips", id);
   const userID = localStorage.getItem("userID") || generateUserID();
 
-  // Ensure reports is an array
-  if (!Array.isArray(reports)) {
-    reports = [];
-  }
+  if (!Array.isArray(reports)) reports = [];
 
   if (reports.includes(userID)) {
     alert("You have already reported this gossip.");
@@ -95,7 +93,7 @@ async function reportGossip(id, reports = []) {
 
 window.reportGossip = reportGossip;
 
-// Function to generate a unique user ID
+// Generate a unique user ID
 function generateUserID() {
   const userID = "user-" + Math.random().toString(36).substr(2, 9);
   localStorage.setItem("userID", userID);
