@@ -1,103 +1,116 @@
-/* General Styling */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: #ffffff;
-    text-align: center;
+/* Global reset */
+* {
     margin: 0;
     padding: 0;
-}
-
-/* Title Styling */
-h1 {
-    font-size: 2rem;
-    margin-top: 20px;
-    color: #ff6b6b;
-}
-
-/* Gossip Input Box */
-textarea {
-    width: 90%;
-    max-width: 600px;
-    height: 120px;
-    background-color: #1e1e1e;
-    border: 2px solid #ff6b6b;
-    color: white;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    resize: none;
-}
-
-/* Post Button */
-button {
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 10px;
-}
-
-button:hover {
-    background-color: #ff4141;
-}
-
-/* Gossip List Container */
-#gossipList {
-    margin-top: 20px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-
-/* Gossip Card */
-.gossip-card {
-    background-color: #1e1e1e;
-    padding: 15px;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 0 20px;
+  }
+  
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-weight: bold;
+  }
+  h3 {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-weight: bold;
+  }
+  h2 {
+    font-size: 2rem;
+    margin-top: 20px;
+    color: #34495e;
+  }
+  
+  textarea {
+    width: 100%;
+    max-width: 500px;
+    height: 120px;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: border 0.3s ease;
+  }
+  
+  textarea:focus {
+    outline: none;
+    border-color: #2980b9;
+  }
+  
+  button {
+    background-color: #3498db;
+    color: white;
+    font-size: 1.2rem;
+    padding: 12px 30px;
+    border: none;
     border-radius: 8px;
-    border-left: 5px solid #ff6b6b;
-    box-shadow: 0px 4px 8px rgba(255, 107, 107, 0.2);
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-.gossip-card p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.gossip-card .timestamp {
-    font-size: 12px;
-    color: #bbbbbb;
-    margin-top: 5px;
-}
-
-/* Fade-in Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 150px;
+  }
+  
+  button:hover {
+    background-color: #2980b9;
+  }
+  
+  #gossipList {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .gossip {
+    background-color: #ffffff;
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .gossip:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .gossip p {
+    font-size: 1.1rem;
+    color: #34495e;
+  }
+  
+  .timestamp {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-top: 12px;
+    font-style: italic;
+  }
+  
+  @media (max-width: 600px) {
     textarea {
-        width: 95%;
+      max-width: 100%;
     }
-
+  
     button {
-        width: 95%;
+      width: 100%;
     }
-}
+  }
+  
