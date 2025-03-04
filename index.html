@@ -51,7 +51,8 @@
             alert("Please write something to gossip about!");
           }
         }
-
+        // Add this after defining the submitGossip function to make it globally accessible
+        window.submitGossip = submitGossip;
         // Function to load gossips
         async function loadGossips() {
           const gossipList = document.getElementById("gossipList");
