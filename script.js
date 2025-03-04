@@ -1,56 +1,74 @@
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbyGvMCfdZz_x35BmlZvq9PckLv5gXaQF2MrRsEDgrEceTF7pyw9-jAiwibVh1Fr5ncMcA/exec"; // Replace with your Apps Script Web App URL
-
-// Fetch gossip posts from Google Sheets
-async function loadGossip() {
-    const response = await fetch(SHEET_URL);
-    const data = await response.json();
-
-    const gossipList = document.getElementById("gossipList");
-    gossipList.innerHTML = "";
-
-    data.reverse().forEach(item => {
-        let div = document.createElement("div");
-        div.classList.add("gossip-card");
-
-        let p = document.createElement("p");
-        p.textContent = item.gossip;
-
-        let timestamp = document.createElement("div");
-        timestamp.classList.add("timestamp");
-        timestamp.textContent = `Posted on ${new Date(item.timestamp).toLocaleString()}`;
-
-        div.appendChild(p);
-        div.appendChild(timestamp);
-        gossipList.appendChild(div);
-    });
-}
-
-// Submit gossip post
-async function submitGossip() {
-    const gossipInput = document.getElementById("gossipInput");
-    const gossipText = gossipInput.value.trim();
-    
-    if (gossipText === "") {
-        alert("Please write something!");
-        return;
-    }
-
-    // Clear input immediately after clicking post
-    gossipInput.value = "";
-
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCHYnW3qaNo7oGKMPs9DFALdWXIeYv6ixY",
+    authDomain: "gossip-38bf8.firebaseapp.com",
+    projectId: "gossip-38bf8",
+    storageBucket: "gossip-38bf8.firebasestorage.app",
+    messagingSenderId: "224975261462",
+    appId: "1:224975261462:web:f08fd243ec4a5c1a4a4a37",
+    measurementId: "G-N7S9894R3N"
+  };
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  // Initialize Firestore
+  const db = firebase.firestore();
+  
+  // Function to retrieve gossips
+  const getGossips = async () => {
     try {
-        await fetch(SHEET_URL, {
-            method: "POST",
-            body: JSON.stringify({ gossip: gossipText }),
-            headers: { "Content-Type": "application/json" }
-        });
-
-        loadGossip(); // Refresh the gossip list
+      const gossipRef = db.collection('gossips');
+      const snapshot = await gossipRef.get();
+      if (snapshot.empty) {
+        console.log('No gossips found!');
+        return;
+      }
+      snapshot.forEach((doc) => {
+        const gossip = doc.data().text;
+        console.log(`Gossip: ${gossip}`);
+        
+        // Append gossip to the list
+        const gossipList = document.getElementById('gossipList');
+        const gossipItem = document.createElement('div');
+        gossipItem.textContent = gossip;
+        gossipList.appendChild(gossipItem);
+      });
     } catch (error) {
-        console.error("Error posting gossip:", error);
-        alert("Failed to post. Please try again.");
+      console.error('Error retrieving gossips:', error);
     }
-}
-
-// Load gossip when the page loads
-window.onload = loadGossip;
+  };
+  
+  // Function to submit a new gossip
+  const submitGossip = async () => {
+    const gossipInput = document.getElementById('gossipInput');
+    const gossipText = gossipInput.value.trim();
+  
+    if (gossipText === '') {
+      alert('Please enter some gossip!');
+      return;
+    }
+  
+    try {
+      // Add gossip to Firestore
+      await db.collection('gossips').add({
+        text: gossipText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      console.log('Gossip posted successfully!');
+  
+      // Clear the input field
+      gossipInput.value = '';
+  
+      // Reload the gossips to display new one
+      getGossips();
+    } catch (error) {
+      console.error('Error posting gossip:', error);
+    }
+  };
+  
+  // Get gossips when the page loads
+  window.onload = () => {
+    getGossips();
+  };
+  
