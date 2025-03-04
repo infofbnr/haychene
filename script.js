@@ -55,7 +55,7 @@ async function submitGossip() {
       await addDoc(collection(db, "gossips"), {
         gossip: gossipText,
         timestamp: new Date(),
-        reports: [],
+        reports: [], // Ensure it's stored as an array
       });
       document.getElementById("gossipInput").value = "";
       loadGossips();
@@ -68,9 +68,14 @@ async function submitGossip() {
 window.submitGossip = submitGossip;
 
 // Function to report gossip (prevents duplicate reports)
-async function reportGossip(id, reports) {
+async function reportGossip(id, reports = []) {
   const gossipRef = doc(db, "gossips", id);
   const userID = localStorage.getItem("userID") || generateUserID();
+
+  // Ensure reports is an array
+  if (!Array.isArray(reports)) {
+    reports = [];
+  }
 
   if (reports.includes(userID)) {
     alert("You have already reported this gossip.");
@@ -122,10 +127,13 @@ async function loadGossips() {
     const gossipElement = document.createElement("div");
     gossipElement.classList.add("gossip");
 
+    // Ensure reports is an array
+    const reportsArray = Array.isArray(gossipData.reports) ? gossipData.reports : [];
+
     gossipElement.innerHTML = `
       <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
       <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
-      <button class="report-btn" onclick="reportGossip('${doc.id}', ${JSON.stringify(gossipData.reports)})">Report</button>
+      <button class="report-btn" onclick="reportGossip('${doc.id}', ${JSON.stringify(reportsArray)})">Report</button>
       ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">Delete</button>` : ""}
     `;
 
