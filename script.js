@@ -35,14 +35,21 @@ async function submitGossip() {
         return;
     }
 
-    await fetch(SHEET_URL, {
-        method: "POST",
-        body: JSON.stringify({ gossip: gossipText }),
-        headers: { "Content-Type": "application/json" }
-    });
-
+    // Clear input immediately after clicking post
     gossipInput.value = "";
-    loadGossip();
+
+    try {
+        await fetch(SHEET_URL, {
+            method: "POST",
+            body: JSON.stringify({ gossip: gossipText }),
+            headers: { "Content-Type": "application/json" }
+        });
+
+        loadGossip(); // Refresh the gossip list
+    } catch (error) {
+        console.error("Error posting gossip:", error);
+        alert("Failed to post. Please try again.");
+    }
 }
 
 // Load gossip when the page loads
