@@ -3,16 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonymous Gossip</title>
+    <title>Hay Shor</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <h1>Hayerou Shorelou Deghe</h1>
-    <h3>Kidenk hayere shad g siren shorel, ouremn hos grnak shorel arants mege kidna ovek!</h3>
-    <textarea id="gossipInput" placeholder="Write some gossip..."></textarea>
-    <button onclick="submitGossip()">Post</button>
-    <h2>Latest Gossip</h2>
-    <div id="gossipList"></div>
+    <header>
+        <h1>Hayerou Shorelou Deghe</h1>
+        <h3>Kidenk hayere shad g siren shorel, ouremn hos grnak shorel arants mege kidna ovek!</h3>
+    </header>
+    
+    <main>
+        <textarea id="gossipInput" placeholder="Write some gossip..."></textarea>
+        <button onclick="submitGossip()">Post</button>
+        
+        <h2>Latest Gossip</h2>
+        <div id="gossipList">
+            <!-- Gossip items will be dynamically added here -->
+        </div>
+    </main>
+
     <script type="module" src="script.js"></script>
+    <script>
+        // Function to dynamically add gossip to the list
+        function submitGossip() {
+            const gossipInput = document.getElementById('gossipInput');
+            const gossipMessage = gossipInput.value.trim();
+            if (gossipMessage) {
+                const gossipList = document.getElementById('gossipList');
+                const newGossip = document.createElement('div');
+                newGossip.classList.add('gossip');
+                
+                // Create the like/dislike buttons
+                const likeButton = document.createElement('button');
+                likeButton.classList.add('like-btn');
+                likeButton.textContent = '👍 Like';
+                likeButton.setAttribute('aria-label', 'Like this gossip');
+                
+                const dislikeButton = document.createElement('button');
+                dislikeButton.classList.add('dislike-btn');
+                dislikeButton.textContent = '👎 Dislike';
+                dislikeButton.setAttribute('aria-label', 'Dislike this gossip');
+                
+                // Create the timestamp
+                const timestamp = document.createElement('p');
+                timestamp.classList.add('timestamp');
+                timestamp.textContent = 'Timestamp here'; // You can add a real timestamp if needed
+                
+                // Create the gossip text
+                const gossipText = document.createElement('p');
+                gossipText.textContent = gossipMessage;
+                
+                // Append everything to the new gossip div
+                newGossip.appendChild(likeButton);
+                newGossip.appendChild(dislikeButton);
+                newGossip.appendChild(gossipText);
+                newGossip.appendChild(timestamp);
+                
+                // Append the new gossip to the gossip list
+                gossipList.appendChild(newGossip);
+                
+                // Clear the input
+                gossipInput.value = '';
+            }
+        }
+
+        // Adding event listeners to like and dislike buttons
+        function addVoteListeners() {
+            const likeButtons = document.querySelectorAll('.like-btn');
+            const dislikeButtons = document.querySelectorAll('.dislike-btn');
+            
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.textContent = '👍 Liked';
+                    this.disabled = true; // Disable the like button once clicked
+                    const dislikeButton = this.nextElementSibling;
+                    if (dislikeButton) {
+                        dislikeButton.disabled = true; // Disable the dislike button as well
+                    }
+                    // Here, you can make an API call to save the like/dislike state if necessary
+                });
+            });
+        
+            dislikeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.textContent = '👎 Disliked';
+                    this.disabled = true; // Disable the dislike button once clicked
+                    const likeButton = this.previousElementSibling;
+                    if (likeButton) {
+                        likeButton.disabled = true; // Disable the like button as well
+                    }
+                    // Here, you can make an API call to save the like/dislike state if necessary
+                });
+            });
+        }
+
+        // Reattach event listeners whenever new gossip is added
+        document.addEventListener('DOMContentLoaded', addVoteListeners);
+        document.getElementById('gossipInput').addEventListener('input', function() {
+            if (this.value.trim()) {
+                document.querySelector('button').disabled = false;
+            } else {
+                document.querySelector('button').disabled = true;
+            }
+        });
+    </script>
 </body>
 </html>

@@ -89,13 +89,50 @@ button:hover {
     margin-bottom: 20px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
-    position: relative;
+    position: relative; /* Allow absolute positioning of buttons inside the gossip */
+    padding-top: 40px; /* Add padding at the top for space for the buttons */
 }
 
-.gossip:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.gossip .save-image-btn,
+.gossip .copy-btn,
+.gossip .report-btn,
+.gossip .delete-btn {
+    position: absolute;
+    z-index: 10; /* Make sure buttons are above the content */
+    width: 24px; /* Match image size */
+    height: 24px; /* Match image size */
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
+.gossip .save-image-btn {
+    top: 10px; /* Position the save button at the top-left */
+    left: 10px;
+}
+
+.gossip .copy-btn {
+    top: 10px; /* Position the copy button slightly to the right of the save button */
+    left: 40px;
+}
+
+.gossip .report-btn {
+    top: 10px; /* Position the report button at the top-right */
+    right: 10px;
+}
+
+.gossip .delete-btn {
+    top: 10px; /* Position the delete button slightly to the left of the report button */
+    right: 40px;
+}
+
+button img {
+    width: 100%; /* Ensure images fit within the buttons */
+    height: 100%;
+    vertical-align: middle;
+}
+
+/* Styling for gossip text and timestamp */
 .gossip p {
     font-size: 1.1rem;
     color: #34495e;
@@ -108,42 +145,18 @@ button:hover {
     font-style: italic;
 }
 
-/* Report and Delete Buttons */
-.report-btn, .delete-btn {
-    font-size: 0.9rem;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
+/* Report Button */
+.report-btn img,
+.delete-btn img,
+.copy-btn img,
+.save-image-btn img {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin: 0;
 }
 
-.report-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.report-btn:hover {
-    background-color: #c0392b;
-}
-
-.delete-btn {
-    background-color: #2c3e50;
-    color: white;
-    font-size: 0.9rem;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-}
-
-.delete-btn:hover {
-    background-color: #1a252f;
-}
-
+/* Media query for mobile responsiveness */
 @media (max-width: 600px) {
     textarea {
         max-width: 100%;
@@ -152,4 +165,41 @@ button:hover {
     button {
         width: 100%;
     }
+
+    /* Adjust button positioning for small screens */
+    .gossip .save-image-btn,
+    .gossip .copy-btn,
+    .gossip .report-btn,
+    .gossip .delete-btn {
+        width: 20px;
+        height: 20px;
+    }
+}
+/* Style for like/dislike buttons */
+.gossip .like-btn,
+.gossip .dislike-btn {
+    background-color: #3498db;
+    color: white;
+    font-size: 1rem;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.gossip .like-btn:hover,
+.gossip .dislike-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Position the buttons */
+.gossip .like-btn {
+    float: left;
+}
+
+.gossip .dislike-btn {
+    float: right;
 }

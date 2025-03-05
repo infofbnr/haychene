@@ -30,7 +30,19 @@ function formatTimestamp(timestamp) {
   const year = date.getFullYear().toString().slice(-2);
   return `${formattedHours}:${formattedMinutes} ${ampm} ${day}/${month}/${year}`;
 }
-
+function createShareableLink(gossipId) {
+  const baseUrl = window.location.origin; // Gets the current website domain
+  return `${baseUrl}/?gossip=${gossipId}`;
+}
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert("Link copied to clipboard!");
+  }).catch(err => {
+    console.error("Failed to copy: ", err);
+    alert("Failed to copy the link.");
+  });
+}
+window.copyToClipboard = copyToClipboard;
 // Function to submit gossip
 async function submitGossip() {
     let gossipText = document.getElementById("gossipInput").value.trim();
@@ -115,20 +127,56 @@ async function loadGossips() {
     const gossipData = doc.data();
     const gossipElement = document.createElement("div");
     gossipElement.classList.add("gossip");
+    gossipElement.setAttribute("id", `gossip-${doc.id}`);
 
-    // Ensure reports is an array
-    const reportsArray = Array.isArray(gossipData.reports) ? gossipData.reports : [];
+    // Generate shareable link
+    const shareableLink = createShareableLink(doc.id);
 
     gossipElement.innerHTML = `
-      <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
-      <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
-      <button class="report-btn" onclick="reportGossip('${doc.id}', ${JSON.stringify(reportsArray)})">Report</button>
-      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">Delete</button>` : ""}
-    `;
+    <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
+    <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
+    <button class="save-image-btn" onclick="generateImage('gossip-${doc.id}')">
+      <img src="pictures/save.png" alt="Save">
+    </button>
+    <button class="copy-btn" onclick="copyToClipboard('${shareableLink}')">
+      <img src="pictures/link.png" alt="Copy">
+    </button>
+    <button class="report-btn" onclick="reportGossip('${doc.id}', ${JSON.stringify(gossipData.reports || [])})">
+      <img src="pictures/flag.png" alt="Report">
+    </button>
+    ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">
+      <img src="pictures/delete.png" alt="Delete">
+    </button>` : ""}
+  `;
+  
 
     gossipList.appendChild(gossipElement);
   });
 }
+
+
+function generateImage(gossipId) {
+  const gossipDiv = document.getElementById(gossipId);
+
+  if (!gossipDiv) {
+    alert("Gossip not found!");
+    return;
+  }
+
+  html2canvas(gossipDiv, { backgroundColor: "#fff", scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = imgData;
+    link.download = "gossip.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }).catch(err => {
+    console.error("Error saving image:", err);
+    alert("Failed to save the image.");
+  });
+}
+window.generateImage = generateImage;
 // Ensure the functions are globally accessible
 window.submitGossip = submitGossip;
 window.deleteGossip = deleteGossip;
