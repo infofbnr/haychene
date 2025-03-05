@@ -100,21 +100,24 @@
   .gossip .delete-btn {
     position: absolute;
     z-index: 10;
-    width: 24px;
-    height: 24px;
+    width: 20px; /* Reduced size */
+    height: 20px; /* Reduced size */
     background: none;
     border: none;
     cursor: pointer;
+    padding: 0;
+    margin: 0;
   }
   
   .gossip .save-image-btn {
     top: 10px;
     left: 10px;
+    z-index: 20; /* Higher z-index for save button */
   }
   
   .gossip .copy-btn {
     top: 10px;
-    left: 40px;
+    left: 50px; /* Increased offset to avoid overlap */
   }
   
   .gossip .report-btn {
@@ -254,36 +257,38 @@
     border-radius: 5px;
     cursor: pointer;
   }
-/* Adjust "View Replies" button size */
-.view-replies-btn {
-  font-size: 0.9rem;
-  padding: 6px 12px;
-  border-radius: 5px;
-  margin-top: 10px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.view-replies-btn:hover {
-  background-color: #2980b9;
-}
-
-/* Style for back button on replies page */
-.back-btn {
-  margin-top: 20px;
-  font-size: 1rem;
-  padding: 8px 16px;
-  border-radius: 5px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.back-btn:hover {
-  background-color: #2980b9;
-}
+  
+  /* Adjust "View Replies" button size */
+  .view-replies-btn {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 5px;
+    margin-top: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .view-replies-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Style for back button on replies page */
+  .back-btn {
+    margin-top: 20px;
+    font-size: 1rem;
+    padding: 8px 16px;
+    border-radius: 5px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    background-color: #2980b9;
+  }
+  
