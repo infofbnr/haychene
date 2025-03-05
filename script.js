@@ -167,6 +167,7 @@ async function loadGossips() {
 // Load the first reply (oldest) for a given gossip and display as clickable snippet
 async function loadFirstReply(gossipId) {
   const firstReplyDiv = document.getElementById(`first-reply-${gossipId}`);
+  const shareableLink = createShareableLink(gossipId);
   const q = query(
     collection(db, "gossips", gossipId, "replies"),
     orderBy("timestamp", "asc"),
@@ -180,12 +181,14 @@ async function loadFirstReply(gossipId) {
     const snippet = replyData.reply.length > 60 
       ? replyData.reply.substring(0, 60) + "..."
       : replyData.reply;
-    // Show a label to indicate these are replies and make it clickable
-    firstReplyDiv.innerHTML = `<span class="reply-snippet" onclick="window.location.href='${createShareableLink(gossipId)}'">First reply: ${snippet}</span>`;
+    // Display clickable snippet with a label indicating it's the first reply
+    firstReplyDiv.innerHTML = `<span class="reply-snippet" onclick="window.location.href='${shareableLink}'">First reply: ${snippet}</span>`;
   } else {
-    firstReplyDiv.innerHTML = `<span class="no-reply">No replies yet</span>`;
+    // Even if there are no replies, display a clickable message that directs to the replies page.
+    firstReplyDiv.innerHTML = `<span class="no-reply" onclick="window.location.href='${shareableLink}'">No replies yet. Click to reply.</span>`;
   }
 }
+
 
 
 // Generate an image of a gossip element
