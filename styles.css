@@ -340,3 +340,11 @@
 .nested-reply-btn:hover {
   background-color: #2980b9;
 }
+.reply-snippet, .no-reply {
+  cursor: pointer;
+  user-select: none; /* Prevent text selection */
+}
+
+.reply-snippet:hover, .no-reply:hover {
+  text-decoration: underline; /* Optional: add hover effect */
+}
