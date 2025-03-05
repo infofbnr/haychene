@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
 import { 
-  getFirestore, doc, getDoc, collection, addDoc, getDocs, updateDoc, deleteDoc, query, orderBy 
+  getFirestore, doc, getDoc, collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, limit 
 } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
 
 // Firebase configuration (same as before)
@@ -34,13 +34,13 @@ function formatTimestamp(timestamp) {
   return `${formattedHours}:${formattedMinutes} ${ampm} ${day}/${month}/${year}`;
 }
 
-// Get gossip ID from URL parameters
+// Get gossip ID from URL parameters (changed parameter name to "id")
 const params = new URLSearchParams(window.location.search);
 const gossipId = params.get("gossip");
 
 if (!gossipId) {
   alert("No gossip specified.");
-  window.location.href = "index.html";
+  window.location.href = "/";
 }
 
 // Load the specific gossip
@@ -55,7 +55,7 @@ async function loadGossip() {
   }
   
   const gossipData = docSnap.data();
-  const shareableLink = window.location.origin + "/replies?gossip=" + gossipId;
+  const shareableLink = window.location.origin + "/replies?id=" + gossipId;
   
   gossipContainer.innerHTML = `
     <div class="gossip" id="gossip-${gossipId}">
@@ -78,26 +78,78 @@ async function loadGossip() {
   loadReplies();
 }
 
-// Load replies for the current gossip sorted newest first
+// Load top-level replies (sorted newest first)
 async function loadReplies() {
   const repliesContainer = document.getElementById("repliesContainer");
   repliesContainer.innerHTML = "";
-  // Query ordering replies by timestamp descending
   const q = query(collection(db, "gossips", gossipId, "replies"), orderBy("timestamp", "desc"));
   const repliesSnapshot = await getDocs(q);
   repliesSnapshot.forEach((replyDoc) => {
     const replyData = replyDoc.data();
     const replyElement = document.createElement("div");
     replyElement.classList.add("reply");
+    replyElement.setAttribute("gossip", `reply-${replyDoc.id}`);
     replyElement.innerHTML = `
       <p>${replyData.reply}</p>
       <p class="timestamp"><em>${formatTimestamp(replyData.timestamp.seconds * 1000)}</em></p>
+      <button class="nested-reply-btn" onclick="toggleNestedReplyForm('${replyDoc.id}')">Reply</button>
+      <div class="nested-replies" id="nested-replies-${replyDoc.id}"></div>
+      <div class="nested-reply-form" id="nested-reply-form-${replyDoc.id}" style="display:none;">
+        <textarea id="nested-reply-input-${replyDoc.id}" placeholder="Write a reply to this reply..."></textarea>
+        <button onclick="submitNestedReply('${replyDoc.id}')">Submit</button>
+      </div>
     `;
     repliesContainer.appendChild(replyElement);
+    loadNestedReplies(replyDoc.id);
   });
 }
 
-// Submit a reply for the current gossip
+// Toggle nested reply form for a given reply
+function toggleNestedReplyForm(replyId) {
+  const formDiv = document.getElementById(`nested-reply-form-${replyId}`);
+  formDiv.style.display = formDiv.style.display === "none" ? "block" : "none";
+}
+
+// Submit a nested reply (reply to a reply)
+async function submitNestedReply(parentReplyId) {
+  const input = document.getElementById(`nested-reply-input-${parentReplyId}`);
+  const replyText = input.value.trim();
+  if (!replyText) {
+    alert("Please write something to reply!");
+    return;
+  }
+  try {
+    await addDoc(collection(db, "gossips", gossipId, "replies", parentReplyId, "replies"), {
+      reply: replyText,
+      timestamp: new Date()
+    });
+    input.value = "";
+    loadNestedReplies(parentReplyId);
+  } catch (e) {
+    console.error("Error adding nested reply: ", e);
+    alert("Failed to post nested reply. Try again.");
+  }
+}
+
+// Load nested replies for a given parent reply
+async function loadNestedReplies(parentReplyId) {
+  const nestedContainer = document.getElementById(`nested-replies-${parentReplyId}`);
+  nestedContainer.innerHTML = "";
+  const q = query(collection(db, "gossips", gossipId, "replies", parentReplyId, "replies"), orderBy("timestamp", "asc"));
+  const nestedSnapshot = await getDocs(q);
+  nestedSnapshot.forEach((nestedDoc) => {
+    const nestedData = nestedDoc.data();
+    const nestedElement = document.createElement("div");
+    nestedElement.classList.add("nested-reply");
+    nestedElement.innerHTML = `
+      <p>${nestedData.reply}</p>
+      <p class="timestamp"><em>${formatTimestamp(nestedData.timestamp.seconds * 1000)}</em></p>
+    `;
+    nestedContainer.appendChild(nestedElement);
+  });
+}
+
+// Submit a top-level reply to the gossip
 async function submitReply() {
   const replyInput = document.getElementById("replyInput");
   const replyText = replyInput.value.trim();
@@ -117,8 +169,8 @@ async function submitReply() {
     alert("Failed to post reply. Try again.");
   }
 }
-window.submitReply = submitReply;
-// Copy text to clipboard (same function as before)
+
+// Copy text to clipboard
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
     alert("Link copied to clipboard!");
@@ -148,7 +200,7 @@ async function reportGossip(id, reports = []) {
   }
   loadGossip();
 }
-window.reportGossip = reportGossip;
+
 // Generate unique user ID (reused)
 function generateUserID() {
   const userID = "user-" + Math.random().toString(36).substr(2, 9);
@@ -164,9 +216,9 @@ async function deleteGossip(id) {
   }
   await deleteDoc(doc(db, "gossips", id));
   alert("Gossip deleted by admin.");
-  window.location.href = "index.html";
+  window.location.href = "/";
 }
-window.deleteGossip = deleteGossip;
+
 // Generate image for the gossip element
 function generateImage(gossipId) {
   const gossipDiv = document.getElementById(gossipId);
@@ -189,5 +241,11 @@ function generateImage(gossipId) {
 }
 window.generateImage = generateImage;
 
-// Initialize page
+// Ensure functions are globally accessible
+window.submitReply = submitReply;
+window.deleteGossip = deleteGossip;
+window.reportGossip = reportGossip;
+window.submitNestedReply = submitNestedReply;
+window.toggleNestedReplyForm = toggleNestedReplyForm;
+
 document.addEventListener("DOMContentLoaded", loadGossip);

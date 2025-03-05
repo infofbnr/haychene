@@ -291,4 +291,52 @@
   .back-btn:hover {
     background-color: #2980b9;
   }
-  
+/* Style for first reply snippet in gossip element */
+.first-reply {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Style for nested replies */
+.nested-reply {
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 5px;
+  margin-left: 20px;
+  font-size: 0.9rem;
+}
+.nested-reply p {
+  margin: 4px 0;
+}
+
+/* Nested reply form styling */
+.nested-reply-form {
+  margin-top: 5px;
+  margin-left: 20px;
+}
+.nested-reply-form textarea {
+  width: 90%;
+  height: 50px;
+  margin-bottom: 5px;
+  padding: 6px;
+  border: 1px solid #3498db;
+  border-radius: 4px;
+}
+.nested-reply-btn {
+  background-color: #3498db;
+  color: white;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+.nested-reply-btn:hover {
+  background-color: #2980b9;
+}

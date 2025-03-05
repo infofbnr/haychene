@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
 import { 
-  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy
+  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit 
 } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
 
 // Your Firebase configuration
@@ -35,7 +35,7 @@ function formatTimestamp(timestamp) {
   return `${formattedHours}:${formattedMinutes} ${ampm} ${day}/${month}/${year}`;
 }
 
-// Generate shareable link for a gossip
+// Generate shareable link for a gossip (URL format: /replies?id=...)
 function createShareableLink(gossipId) {
   const baseUrl = window.location.origin;
   return `${baseUrl}/replies?gossip=${gossipId}`;
@@ -126,10 +126,11 @@ async function loadGossips() {
   const gossipList = document.getElementById("gossipList");
   gossipList.innerHTML = "";
 
-  // Query ordering by timestamp descending
   const q = query(collection(db, "gossips"), orderBy("timestamp", "desc"));
   const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((docSnapshot) => {
+  
+  // Use for...of to allow awaiting for the first reply query per gossip
+  for (const docSnapshot of querySnapshot.docs) {
     const gossipData = docSnapshot.data();
     const gossipElement = document.createElement("div");
     gossipElement.classList.add("gossip");
@@ -138,7 +139,7 @@ async function loadGossips() {
     // Generate shareable link
     const shareableLink = createShareableLink(docSnapshot.id);
 
-    // Build gossip element inner HTML without inline replies
+    // Build gossip element inner HTML
     gossipElement.innerHTML = `
       <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
       <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
@@ -154,15 +155,38 @@ async function loadGossips() {
       ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${docSnapshot.id}')">
         <img src="pictures/delete.png" alt="Delete">
       </button>` : ""}
-      <button class="view-replies-btn" onclick="window.location.href='/replies?gossip=${docSnapshot.id}'">
-        View Replies
-      </button>
-
+      <div class="first-reply" id="first-reply-${docSnapshot.id}"></div>
     `;
 
     gossipList.appendChild(gossipElement);
-  });
+    // Load the first reply snippet for this gossip
+    loadFirstReply(docSnapshot.id);
+  }
 }
+
+// Load the first reply (oldest) for a given gossip and display as clickable snippet
+async function loadFirstReply(gossipId) {
+  const firstReplyDiv = document.getElementById(`first-reply-${gossipId}`);
+  const q = query(
+    collection(db, "gossips", gossipId, "replies"),
+    orderBy("timestamp", "asc"),
+    limit(1)
+  );
+  const replySnapshot = await getDocs(q);
+  if (!replySnapshot.empty) {
+    const replyDoc = replySnapshot.docs[0];
+    const replyData = replyDoc.data();
+    // Limit snippet to 60 characters
+    const snippet = replyData.reply.length > 60 
+      ? replyData.reply.substring(0, 60) + "..."
+      : replyData.reply;
+    // Show a label to indicate these are replies and make it clickable
+    firstReplyDiv.innerHTML = `<span class="reply-snippet" onclick="window.location.href='${createShareableLink(gossipId)}'">First reply: ${snippet}</span>`;
+  } else {
+    firstReplyDiv.innerHTML = `<span class="no-reply">No replies yet</span>`;
+  }
+}
+
 
 // Generate an image of a gossip element
 function generateImage(gossipId) {
