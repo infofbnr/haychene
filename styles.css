@@ -3,9 +3,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-body {
+  }
+  
+  body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f5f5f5;
     color: #333;
@@ -16,29 +16,29 @@ body {
     min-height: 100vh;
     text-align: center;
     padding: 0 20px;
-}
-
-h1 {
+  }
+  
+  h1 {
     font-size: 3rem;
     margin-bottom: 20px;
     color: #2c3e50;
     font-weight: bold;
-}
-
-h3 {
+  }
+  
+  h3 {
     font-size: 1rem;
     margin-bottom: 20px;
     color: #2c3e50;
     font-weight: bold;
-}
-
-h2 {
+  }
+  
+  h2 {
     font-size: 2rem;
     margin-top: 20px;
     color: #34495e;
-}
-
-textarea {
+  }
+  
+  textarea {
     width: 100%;
     max-width: 500px;
     height: 120px;
@@ -51,14 +51,14 @@ textarea {
     background-color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: border 0.3s ease;
-}
-
-textarea:focus {
+  }
+  
+  textarea:focus {
     outline: none;
     border-color: #2980b9;
-}
-
-button {
+  }
+  
+  button {
     background-color: #3498db;
     color: white;
     font-size: 1.2rem;
@@ -68,20 +68,20 @@ button {
     cursor: pointer;
     transition: background-color 0.3s ease;
     width: 150px;
-}
-
-button:hover {
+  }
+  
+  button:hover {
     background-color: #2980b9;
-}
-
-/* Style for gossip list */
-#gossipList {
+  }
+  
+  /* Style for gossip list */
+  #gossipList {
     margin-top: 30px;
     width: 100%;
     max-width: 600px;
-}
-
-.gossip {
+  }
+  
+  .gossip {
     background-color: #ffffff;
     border: 1px solid #ecf0f1;
     border-radius: 8px;
@@ -89,95 +89,77 @@ button:hover {
     margin-bottom: 20px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
-    position: relative; /* Allow absolute positioning of buttons inside the gossip */
-    padding-top: 40px; /* Add padding at the top for space for the buttons */
-}
-
-.gossip .save-image-btn,
-.gossip .copy-btn,
-.gossip .report-btn,
-.gossip .delete-btn {
+    position: relative;
+    padding-top: 40px;
+  }
+  
+  /* Button styles within a gossip */
+  .gossip .save-image-btn,
+  .gossip .copy-btn,
+  .gossip .report-btn,
+  .gossip .delete-btn {
     position: absolute;
-    z-index: 10; /* Make sure buttons are above the content */
-    width: 24px; /* Match image size */
-    height: 24px; /* Match image size */
+    z-index: 10;
+    width: 24px;
+    height: 24px;
     background: none;
     border: none;
     cursor: pointer;
-}
-
-.gossip .save-image-btn {
-    top: 10px; /* Position the save button at the top-left */
+  }
+  
+  .gossip .save-image-btn {
+    top: 10px;
     left: 10px;
-}
-
-.gossip .copy-btn {
-    top: 10px; /* Position the copy button slightly to the right of the save button */
+  }
+  
+  .gossip .copy-btn {
+    top: 10px;
     left: 40px;
-}
-
-.gossip .report-btn {
-    top: 10px; /* Position the report button at the top-right */
+  }
+  
+  .gossip .report-btn {
+    top: 10px;
     right: 10px;
-}
-
-.gossip .delete-btn {
-    top: 10px; /* Position the delete button slightly to the left of the report button */
+  }
+  
+  .gossip .delete-btn {
+    top: 10px;
     right: 40px;
-}
-
-button img {
-    width: 100%; /* Ensure images fit within the buttons */
+  }
+  
+  button img {
+    width: 100%;
     height: 100%;
     vertical-align: middle;
-}
-
-/* Styling for gossip text and timestamp */
-.gossip p {
+  }
+  
+  /* Styling for gossip text and timestamp */
+  .gossip p {
     font-size: 1.1rem;
     color: #34495e;
-}
-
-.timestamp {
+  }
+  
+  .timestamp {
     font-size: 0.9rem;
     color: #7f8c8d;
     margin-top: 12px;
     font-style: italic;
-}
-
-/* Report Button */
-.report-btn img,
-.delete-btn img,
-.copy-btn img,
-.save-image-btn img {
+  }
+  
+  /* Report, copy, and image button images */
+  .report-btn img,
+  .delete-btn img,
+  .copy-btn img,
+  .save-image-btn img {
     width: 20px;
     height: 20px;
     vertical-align: middle;
     margin: 0;
-}
-
-/* Media query for mobile responsiveness */
-@media (max-width: 600px) {
-    textarea {
-        max-width: 100%;
-    }
-
-    button {
-        width: 100%;
-    }
-
-    /* Adjust button positioning for small screens */
-    .gossip .save-image-btn,
-    .gossip .copy-btn,
-    .gossip .report-btn,
-    .gossip .delete-btn {
-        width: 20px;
-        height: 20px;
-    }
-}
-/* Style for like/dislike buttons */
-.gossip .like-btn,
-.gossip .dislike-btn {
+  }
+  
+  /* Like/Dislike button styling (if needed) */
+  .gossip .like-btn,
+  .gossip .dislike-btn {
     background-color: #3498db;
     color: white;
     font-size: 1rem;
@@ -188,18 +170,120 @@ button img {
     margin-top: 10px;
     margin-right: 5px;
     transition: background-color 0.3s ease;
-}
-
-.gossip .like-btn:hover,
-.gossip .dislike-btn:hover {
+  }
+  
+  .gossip .like-btn:hover,
+  .gossip .dislike-btn:hover {
     background-color: #2980b9;
-}
-
-/* Position the buttons */
-.gossip .like-btn {
+  }
+  
+  .gossip .like-btn {
     float: left;
+  }
+  
+  .gossip .dislike-btn {
+    float: right;
+  }
+  
+  /* Media query for mobile responsiveness */
+  @media (max-width: 600px) {
+    textarea {
+      max-width: 100%;
+    }
+    button {
+      width: 100%;
+    }
+    .gossip .save-image-btn,
+    .gossip .copy-btn,
+    .gossip .report-btn,
+    .gossip .delete-btn {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  
+  /* Additional styles for replies */
+  .replies-section {
+    margin-top: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ecf0f1;
+    padding-top: 10px;
+  }
+  
+  .replies-section h4 {
+    font-size: 1.2rem;
+    color: #34495e;
+    margin-bottom: 10px;
+  }
+  
+  .replies-container {
+    margin-bottom: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .reply {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .reply p {
+    margin: 5px 0;
+  }
+  
+  .replies-section textarea {
+    width: 100%;
+    max-width: 100%;
+    height: 60px;
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .replies-section button {
+    background-color: #3498db;
+    color: white;
+    font-size: 1rem;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+/* Adjust "View Replies" button size */
+.view-replies-btn {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 5px;
+  margin-top: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.gossip .dislike-btn {
-    float: right;
+.view-replies-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Style for back button on replies page */
+.back-btn {
+  margin-top: 20px;
+  font-size: 1rem;
+  padding: 8px 16px;
+  border-radius: 5px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #2980b9;
 }

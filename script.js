@@ -1,6 +1,10 @@
+// Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy
+} from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
 
+// Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCHYnW3qaNo7oGKMPs9DFALdWXIeYv6ixY",
   authDomain: "gossip-38bf8.firebaseapp.com",
@@ -15,9 +19,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let isAdmin = localStorage.getItem("isAdmin") === "true"; // Load admin status from storage
+let isAdmin = localStorage.getItem("isAdmin") === "true"; // Admin status
 
-// Function to format the timestamp
+// Format timestamp function
 function formatTimestamp(timestamp) {
   const date = new Date(timestamp);
   const hours = date.getHours();
@@ -30,10 +34,14 @@ function formatTimestamp(timestamp) {
   const year = date.getFullYear().toString().slice(-2);
   return `${formattedHours}:${formattedMinutes} ${ampm} ${day}/${month}/${year}`;
 }
+
+// Generate shareable link for a gossip
 function createShareableLink(gossipId) {
-  const baseUrl = window.location.origin; // Gets the current website domain
-  return `${baseUrl}/?gossip=${gossipId}`;
+  const baseUrl = window.location.origin;
+  return `${baseUrl}/replies?gossip=${gossipId}`;
 }
+
+// Copy text to clipboard
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
     alert("Link copied to clipboard!");
@@ -43,50 +51,48 @@ function copyToClipboard(text) {
   });
 }
 window.copyToClipboard = copyToClipboard;
-// Function to submit gossip
+
+// Submit a new gossip
 async function submitGossip() {
-    let gossipText = document.getElementById("gossipInput").value.trim();
-    let postButton = document.querySelector("button");
+  let gossipText = document.getElementById("gossipInput").value.trim();
+  let postButton = document.querySelector("button");
   
-    if (!gossipText) {
-      alert("Please write something to gossip about!");
-      return;
-    }
-  
-    // Disable button to prevent spam
-    postButton.disabled = true;
-    postButton.textContent = "Posting...";
-  
-    try {
-      await addDoc(collection(db, "gossips"), {
-        gossip: gossipText,
-        timestamp: new Date(),
-        reports: []
-      });
-      document.getElementById("gossipInput").value = "";
-      loadGossips();
-    } catch (e) {
-      console.error("Error adding gossip: ", e);
-      alert("Failed to post gossip. Try again.");
-    }
-  
-    // Re-enable button after completion
-    postButton.disabled = false;
-    postButton.textContent = "Post";
+  if (!gossipText) {
+    alert("Please write something to gossip about!");
+    return;
   }
   
-// Function to report gossip
+  // Prevent spam
+  postButton.disabled = true;
+  postButton.textContent = "Posting...";
+  
+  try {
+    await addDoc(collection(db, "gossips"), {
+      gossip: gossipText,
+      timestamp: new Date(),
+      reports: []
+    });
+    document.getElementById("gossipInput").value = "";
+    loadGossips();
+  } catch (e) {
+    console.error("Error adding gossip: ", e);
+    alert("Failed to post gossip. Try again.");
+  }
+  
+  postButton.disabled = false;
+  postButton.textContent = "Post";
+}
+
+// Report a gossip
 async function reportGossip(id, reports = []) {
   const gossipRef = doc(db, "gossips", id);
   const userID = localStorage.getItem("userID") || generateUserID();
 
   if (!Array.isArray(reports)) reports = [];
-
   if (reports.includes(userID)) {
     alert("You have already reported this gossip.");
     return;
   }
-
   reports.push(userID);
   if (reports.length >= 3) {
     await deleteDoc(gossipRef);
@@ -94,75 +100,77 @@ async function reportGossip(id, reports = []) {
   } else {
     await updateDoc(gossipRef, { reports });
   }
-
   loadGossips();
 }
 
-// Generate a unique user ID
+// Generate unique user ID
 function generateUserID() {
   const userID = "user-" + Math.random().toString(36).substr(2, 9);
   localStorage.setItem("userID", userID);
   return userID;
 }
 
-// Function to delete gossip (admin only)
+// Delete gossip (admin only)
 async function deleteGossip(id) {
   if (!isAdmin) {
     alert("You are not an admin!");
     return;
   }
-
   await deleteDoc(doc(db, "gossips", id));
   alert("Gossip deleted by admin.");
   loadGossips();
 }
 
-// Function to load gossips
+// Load all gossips from Firestore sorted newest first
 async function loadGossips() {
   const gossipList = document.getElementById("gossipList");
   gossipList.innerHTML = "";
 
-  const querySnapshot = await getDocs(collection(db, "gossips"));
-  querySnapshot.forEach((doc) => {
-    const gossipData = doc.data();
+  // Query ordering by timestamp descending
+  const q = query(collection(db, "gossips"), orderBy("timestamp", "desc"));
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((docSnapshot) => {
+    const gossipData = docSnapshot.data();
     const gossipElement = document.createElement("div");
     gossipElement.classList.add("gossip");
-    gossipElement.setAttribute("id", `gossip-${doc.id}`);
+    gossipElement.setAttribute("id", `gossip-${docSnapshot.id}`);
 
     // Generate shareable link
-    const shareableLink = createShareableLink(doc.id);
+    const shareableLink = createShareableLink(docSnapshot.id);
 
+    // Build gossip element inner HTML without inline replies
     gossipElement.innerHTML = `
-    <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
-    <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
-    <button class="save-image-btn" onclick="generateImage('gossip-${doc.id}')">
-      <img src="pictures/save.png" alt="Save">
-    </button>
-    <button class="copy-btn" onclick="copyToClipboard('${shareableLink}')">
-      <img src="pictures/link.png" alt="Copy">
-    </button>
-    <button class="report-btn" onclick="reportGossip('${doc.id}', ${JSON.stringify(gossipData.reports || [])})">
-      <img src="pictures/flag.png" alt="Report">
-    </button>
-    ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">
-      <img src="pictures/delete.png" alt="Delete">
-    </button>` : ""}
-  `;
-  
+      <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
+      <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
+      <button class="save-image-btn" onclick="generateImage('gossip-${docSnapshot.id}')">
+        <img src="pictures/save.png" alt="Save">
+      </button>
+      <button class="copy-btn" onclick="copyToClipboard('${shareableLink}')">
+        <img src="pictures/link.png" alt="Copy">
+      </button>
+      <button class="report-btn" onclick="reportGossip('${docSnapshot.id}', ${JSON.stringify(gossipData.reports || [])})">
+        <img src="pictures/flag.png" alt="Report">
+      </button>
+      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${docSnapshot.id}')">
+        <img src="pictures/delete.png" alt="Delete">
+      </button>` : ""}
+      <button class="view-replies-btn" onclick="window.location.href='/replies?gossip=${docSnapshot.id}'">
+        View Replies
+      </button>
+
+    `;
 
     gossipList.appendChild(gossipElement);
   });
 }
 
-
+// Generate an image of a gossip element
 function generateImage(gossipId) {
   const gossipDiv = document.getElementById(gossipId);
-
   if (!gossipDiv) {
     alert("Gossip not found!");
     return;
   }
-
   html2canvas(gossipDiv, { backgroundColor: "#fff", scale: 2 }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
     const link = document.createElement("a");
@@ -177,12 +185,11 @@ function generateImage(gossipId) {
   });
 }
 window.generateImage = generateImage;
-// Ensure the functions are globally accessible
+
+// Ensure functions are globally accessible
 window.submitGossip = submitGossip;
 window.deleteGossip = deleteGossip;
 window.reportGossip = reportGossip;
-
-// Load gossips on page load
 
 document.addEventListener("DOMContentLoaded", () => {
   isAdmin = localStorage.getItem("isAdmin") === "true"; 
