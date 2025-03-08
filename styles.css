@@ -348,3 +348,16 @@
 .reply-snippet:hover, .no-reply:hover {
   text-decoration: underline; /* Optional: add hover effect */
 }
+.logo {
+  width: 50px; /* Adjust size as needed */
+  height: 50px;
+}
+
+.site-title {
+  font-size: 2rem; /* Adjust font size as needed */
+  margin: 0;
+}
+
+.lmao2 {
+  object-fit: contain;
+}
