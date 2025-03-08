@@ -55,7 +55,7 @@ async function loadGossip() {
   }
   
   const gossipData = docSnap.data();
-  const shareableLink = window.location.origin + "/replies?id=" + gossipId;
+  const shareableLink = window.location.origin + "/replies?gossip=" + gossipId;
   
   gossipContainer.innerHTML = `
     <div class="gossip" id="gossip-${gossipId}">
