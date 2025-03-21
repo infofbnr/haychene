@@ -1,13 +1,7 @@
 [
     {
-      "origin": ["*"],
-      "method": [
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE",
-        "OPTIONS"
-      ],
+      "origin": ["https://mano.is-a.dev"],
+      "method": ["GET", "POST", "PUT"],
       "maxAgeSeconds": 3600
     }
   ]
