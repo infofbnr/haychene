@@ -351,16 +351,33 @@ fileInput.addEventListener("change", function(event) {
   }
 });
 
-const darkModeToggle = document.getElementById("darkModeToggle");
+const darkModeBtn = document.getElementById('darkModeBtn');
 const body = document.body;
-const h1 = document.h1;
-const h2 = document.h2;
-const h3 = document.h3;
-// Listen for the dark mode button click event
-darkModeToggle.addEventListener("click", function() {
+
+// Function to toggle dark mode
+function toggleDarkMode() {
   // Toggle the 'dark-mode' class on the body element
-  body.classList.toggle("dark-mode");
-  h1.classList.toggle("dark-mode");
-  h2.classList.toggle("dark-mode");
-  h3.classList.toggle("dark-mode");
+  body.classList.toggle('dark-mode');
+  
+  // Save the current theme to localStorage
+  if (body.classList.contains('dark-mode')) {
+    localStorage.setItem('theme', 'dark');
+  } else {
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+// Check localStorage for theme preference on page load
+window.addEventListener('load', () => {
+  const theme = localStorage.getItem('theme');
+  
+  // If the theme is dark, apply dark mode, otherwise light mode
+  if (theme === 'dark') {
+    body.classList.add('dark-mode');
+  } else {
+    body.classList.remove('dark-mode');
+  }
 });
+
+// Add an event listener to the button to toggle dark mode
+darkModeBtn.addEventListener('click', toggleDarkMode);

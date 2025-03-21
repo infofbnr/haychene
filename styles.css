@@ -70,9 +70,6 @@ button {
   width: 150px;
 }
 
-button:hover {
-  background-color: #2980b9;
-}
 
 /* Style for gossip list */
 #gossipList {
@@ -521,26 +518,25 @@ input[type="file"] {
   border-radius: 10px;
 }
 
+/* Position the dark mode button in the top-right corner */
+.dark-mode-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 24px; /* Adjust the size of the moon emoji */
+  cursor: pointer;
+  z-index: 1000; /* Ensure the button is on top of other elements */
+}
+
 body.dark-mode {
   background-color: #121212;
-  color: #e0e0e0;
+  color: white;
 }
+
 body.dark-mode h1,
 body.dark-mode h2,
 body.dark-mode h3 {
   color: rgb(228, 200, 200);
-}
-.dark-mode-btn {
-  padding: 10px 20px;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.dark-mode-btn:hover {
-  background-color: #555;
 }
