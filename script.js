@@ -83,11 +83,6 @@ async function submitGossip() {
   document.getElementById("gossipInput").value = "";
   fileInput.value = ""; 
   loadGossips();
-  let postButton = document.querySelector("button");
-
-  // Prevent spam
-  postButton.disabled = true;
-  postButton.textContent = "Posting...";
 
   let mediaUrl = null;
 
@@ -118,9 +113,6 @@ async function submitGossip() {
     console.error("Error adding gossip: ", e);
     alert("Failed to post gossip. Try again.");
   }
-  
-  postButton.disabled = false;
-  postButton.textContent = "Post";
 }
 
 // Report a gossip
