@@ -13,7 +13,9 @@
   <div style="margin-right: auto">
     <button id="sidebarToggle">☰</button>
   </div>
-
+    <div style="margin-left: auto">
+      <button id="darkModeBtn" class="dark-mode-btn">🌙</button>
+    </div>
   <nav id="sidebar" class="hidden">
     <button id="closeSidebar">&times;</button>
     <ul>
@@ -53,12 +55,13 @@
   <main>
     <textarea id="gossipInput" placeholder="Write some gossip..."></textarea>
     <div class="file-upload-container">
-      <input type="file" id="fileInput" accept="image/*,video/*">
+      <input type="file" id="fileInput" accept="image/png, image/jpeg">
+      <p id="errorMessage" style="color: red; display: none;">Only PNG and JPEG files are allowed.</p>
+
       <label for="fileInput" class="file-label">Upload Media</label>
       <div id="preview" class="preview-container"></div>
     </div>
-    <button id="darkModeBtn" class="dark-mode-btn">🌙</button>
-    
+
     <button onclick="submitGossip()">Post</button>
     
     <h2>Latest Gossip</h2>

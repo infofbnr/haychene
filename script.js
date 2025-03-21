@@ -310,46 +310,7 @@ window.openTOS = function openTOS() {
 window.closeTOS = function closeTOS() {
   document.getElementById("tosModal").style.display = "none"; // Close the modal
 };
-// Get file input and preview container elements
-const fileInput = document.getElementById("fileInput");
-const previewContainer = document.getElementById("preview");
 
-// Listen for file input change event
-fileInput.addEventListener("change", function(event) {
-  const file = event.target.files[0];
-  
-  // Clear any previous previews
-  previewContainer.innerHTML = "";
-
-  // If a file is selected
-  if (file) {
-    const reader = new FileReader();
-
-    // When the file is read successfully
-    reader.onload = function(e) {
-      const fileType = file.type.split("/")[0]; // Get file type (image/video)
-      const fileURL = e.target.result;
-
-      // If it's an image
-      if (fileType === "image") {
-        const img = document.createElement("img");
-        img.src = fileURL;
-        previewContainer.appendChild(img);
-      }
-
-      // If it's a video
-      else if (fileType === "video") {
-        const video = document.createElement("video");
-        video.src = fileURL;
-        video.controls = true; // Allow playback controls for video
-        previewContainer.appendChild(video);
-      }
-    };
-
-    // Read the file as a data URL
-    reader.readAsDataURL(file);
-  }
-});
 
 const darkModeBtn = document.getElementById('darkModeBtn');
 const body = document.body;
@@ -381,3 +342,41 @@ window.addEventListener('load', () => {
 
 // Add an event listener to the button to toggle dark mode
 darkModeBtn.addEventListener('click', toggleDarkMode);
+const fileInput = document.getElementById("fileInput");
+const previewContainer = document.getElementById("preview");
+const errorMessage = document.getElementById("errorMessage");
+
+// Listen for file input change event
+fileInput.addEventListener("change", function(event) {
+  const file = event.target.files[0];
+
+  // Clear any previous previews and error messages
+  previewContainer.innerHTML = "";
+  errorMessage.style.display = "none"; // Hide error message
+
+  // If a file is selected
+  if (!file) return;
+
+  // Validate file type
+  const allowedTypes = ["image/png", "image/jpeg"];
+  if (!allowedTypes.includes(file.type)) {
+    errorMessage.style.display = "block"; // Show error message
+    errorMessage.innerText = "Only PNG and JPEG images are allowed!";
+    fileInput.value = ""; // Clear invalid file selection
+    return; // Exit if the file is invalid
+  }
+
+  // Preview the image
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.createElement("img");
+    img.src = e.target.result;
+    img.style.maxWidth = "100px"; // Limit preview size
+    img.style.maxHeight = "100px";
+    img.style.marginTop = "10px";
+    previewContainer.appendChild(img);
+  };
+
+  // Read the file as a data URL
+  reader.readAsDataURL(file);
+});

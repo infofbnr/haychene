@@ -385,11 +385,6 @@ button img,
   transition: background-color 0.3s ease;
 }
 
-#sidebarToggle:hover {
-  background-color: rgba(52, 152, 219, 0.1);
-  border-radius: 5px;
-}
-
 /* Sidebar Menu */
 #sidebar {
   position: fixed;
@@ -517,19 +512,9 @@ input[type="file"] {
   max-height: 200px;
   border-radius: 10px;
 }
-
-/* Position the dark mode button in the top-right corner */
 .dark-mode-btn {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  font-size: 24px; /* Adjust the size of the moon emoji */
-  cursor: pointer;
-  z-index: 1000; /* Ensure the button is on top of other elements */
+  background: none;
 }
-
 body.dark-mode {
   background-color: #121212;
   color: white;
