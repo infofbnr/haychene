@@ -375,6 +375,11 @@ button img,
   transform: translate(-50%, -50%);
 }
 
+/* Sidebar Toggle Button (Hamburger Icon) */
+/* Global hamburger icon style */
+/* Hamburger Toggle Button */
+/* Apply styles for the sidebar toggle button */
+/* Basic styles for the sidebar toggle button */
 #sidebarToggle {
   position: fixed;
   top: 0;
@@ -389,22 +394,20 @@ button img,
   transition: background-color 0.3s ease;
 }
 
+/* Media Query for Adjusting Styles in Mobile View */
 @media (max-width: 600px) {
   #sidebarToggle {
-    font-size: 1.5rem;
-    top: 15px;
-    left: 0;
+    font-size: 1.5rem; /* Slightly reduce font size for smaller screens */
+    top: 15px; /* Space from the top */
   }
 }
-#sidebardiv {
-  height: 100vh;
-  width: 100vw;
-}
+/* Add a hover effect for better interactivity */
 #sidebarToggle:hover {
-  background-color: rgba(52, 152, 219, 0.1);
-  border-radius: 5px;
+  background-color: rgba(52, 152, 219, 0.1); /* Light background on hover */
+  border-radius: 5px; /* Rounding corners slightly */
 }
 
+/* Sidebar Menu */
 #sidebar {
   position: fixed;
   top: 0;
@@ -418,10 +421,12 @@ button img,
   z-index: 1100;
 }
 
+/* Hide sidebar by sliding it off-screen */
 #sidebar.hidden {
   transform: translateX(-100%);
 }
 
+/* Sidebar Menu Items */
 #sidebar ul {
   list-style: none;
   padding: 0;
@@ -461,9 +466,5 @@ button img,
   .gossip .delete-btn {
     width: 20px;
     height: 20px;
-  }
-  #sidebarToggle {
-    left: 0;
-    top: 0;
   }
 }
