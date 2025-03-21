@@ -10,17 +10,18 @@
 
 </head>
 <body>
-  <!-- Hamburger Toggle Button -->
-  <button id="sidebarToggle">☰</button>
+  <div style="margin-right: auto">
+    <button id="sidebarToggle">☰</button>
+  </div>
 
-
-  <!-- Sidebar Menu -->
   <nav id="sidebar" class="hidden">
+    <button id="closeSidebar">&times;</button>
     <ul>
       <li><a href="/">Main</a></li>
-      <li><a href="javascript:void(0)" id="tosLink">ToS</a></li>
+      <li><a href="/tos/" id="tosLink">Terms of Service</a></li>
     </ul>
   </nav>
+
   <img class=" lmao lmao2" src="hayshor.png" width="150" height="150">
   <header>
     <h1>Hayerou Shorelou Deghe</h1>
@@ -29,12 +30,21 @@
   <div id="tosModal" class="modal">
     <div class="modal-content">
       <h2>Terms of Service</h2>
+      <br>
       <p>By using this website, you agree to the following:</p>
+      <br>
       <ul>
         <p>1. The website owner is not responsible for any content posted by users.</p>
-        <p>2. You cannot contact the owner regarding gossips about yourself.</p>
+        <br>
+        <p>2. You cannot contact the owner regarding gossips about yourself, except for extreme cases.</p>
+        <br>
         <p>3. All posts are anonymous and irreversible.</p>
+        <br>
         <p>4. Moderation actions are at the owner's discretion.</p>
+        <br>
+        <p>You can read more about this <a href="/tos/">here</a></p>
+        <br>
+        <br>
       </ul>
       <button onclick="acceptTOS()">I Agree</button>
     </div>
@@ -42,6 +52,13 @@
 
   <main>
     <textarea id="gossipInput" placeholder="Write some gossip..."></textarea>
+    <div class="file-upload-container">
+      <input type="file" id="fileInput" accept="image/*,video/*">
+      <label for="fileInput" class="file-label">Upload Media</label>
+      <div id="preview" class="preview-container"></div>
+    </div>
+    <button id="darkModeToggle" class="dark-mode-btn">Toggle Dark Mode</button>
+    
     <button onclick="submitGossip()">Post</button>
     
     <h2>Latest Gossip</h2>

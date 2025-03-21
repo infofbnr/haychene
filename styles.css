@@ -35,7 +35,7 @@ h3 {
 h2 {
   font-size: 2rem;
   margin-top: 20px;
-  color: #34495e;
+  color: #0a141d;
 }
 
 textarea {
@@ -375,13 +375,7 @@ button img,
   transform: translate(-50%, -50%);
 }
 
-/* Sidebar Toggle Button (Hamburger Icon) */
-/* Global hamburger icon style */
-/* Hamburger Toggle Button */
-/* Apply styles for the sidebar toggle button */
-/* Basic styles for the sidebar toggle button */
 #sidebarToggle {
-  position: fixed;
   top: 0;
   left: 0;
   z-index: 1200;
@@ -394,17 +388,9 @@ button img,
   transition: background-color 0.3s ease;
 }
 
-/* Media Query for Adjusting Styles in Mobile View */
-@media (max-width: 600px) {
-  #sidebarToggle {
-    font-size: 1.5rem; /* Slightly reduce font size for smaller screens */
-    top: 15px; /* Space from the top */
-  }
-}
-/* Add a hover effect for better interactivity */
 #sidebarToggle:hover {
-  background-color: rgba(52, 152, 219, 0.1); /* Light background on hover */
-  border-radius: 5px; /* Rounding corners slightly */
+  background-color: rgba(52, 152, 219, 0.1);
+  border-radius: 5px;
 }
 
 /* Sidebar Menu */
@@ -416,12 +402,11 @@ button img,
   height: 100%;
   background-color: #333;
   color: white;
-  padding-top: 60px; /* leaves room for the hamburger icon */
+  padding-top: 60px;
   transition: transform 0.3s ease;
   z-index: 1100;
 }
 
-/* Hide sidebar by sliding it off-screen */
 #sidebar.hidden {
   transform: translateX(-100%);
 }
@@ -435,6 +420,16 @@ button img,
 
 #sidebar ul li {
   margin: 20px 0;
+}
+#closeSidebar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
 }
 
 #sidebar ul li a {
@@ -467,4 +462,85 @@ button img,
     width: 20px;
     height: 20px;
   }
+}
+/* Container for the file input */
+.file-upload-container {
+  width: 300px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Hide the default file input */
+input[type="file"] {
+  display: none;
+}
+
+/* Custom button for file input */
+.file-label {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.file-label:hover {
+  background-color: #45a049;
+}
+
+/* Preview container */
+.preview-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+
+/* Style for the preview image */
+.preview-container img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Style for the preview video */
+.preview-container video {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 10px;
+}
+
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+  color: rgb(228, 200, 200);
+}
+.dark-mode-btn {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.dark-mode-btn:hover {
+  background-color: #555;
 }

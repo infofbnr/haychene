@@ -1,15 +1,16 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
 import { 
-  getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit 
+  getFirestore, collection, addDoc, getDocs,limit, updateDoc, deleteDoc, doc, query, orderBy 
 } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCHYnW3qaNo7oGKMPs9DFALdWXIeYv6ixY",
   authDomain: "gossip-38bf8.firebaseapp.com",
   projectId: "gossip-38bf8",
-  storageBucket: "gossip-38bf8.firebasestorage.app",
+  storageBucket: "gossip-38bf8.appspot.com",
   messagingSenderId: "224975261462",
   appId: "1:224975261462:web:f08fd243ec4a5c1a4a4a37",
   measurementId: "G-N7S9894R3N"
@@ -18,6 +19,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 let isAdmin = localStorage.getItem("isAdmin") === "true"; // Admin status
 
@@ -51,29 +53,67 @@ function copyToClipboard(text) {
   });
 }
 window.copyToClipboard = copyToClipboard;
+const storage = getStorage(app);
 
 // Submit a new gossip
 async function submitGossip() {
   let gossipText = document.getElementById("gossipInput").value.trim();
-  let postButton = document.querySelector("button");
-  
-  if (!gossipText) {
-    alert("Please write something to gossip about!");
+  let fileInput = document.getElementById("fileInput");
+  let file = fileInput.files[0]; 
+
+  if (!gossipText && !file) {
+    alert("Please write something or upload a file!");
     return;
   }
-  
+
+  let fileURL = "";
+  if (file) {
+    const storageRef = ref(storage, `uploads/${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    fileURL = await getDownloadURL(snapshot.ref);
+  }
+
+  await addDoc(collection(db, "gossips"), {
+    gossip: gossipText,
+    fileURL: fileURL, 
+    timestamp: new Date(),
+    reports: [] 
+  });
+
+  document.getElementById("gossipInput").value = "";
+  fileInput.value = ""; 
+  loadGossips();
+  let postButton = document.querySelector("button");
+
   // Prevent spam
   postButton.disabled = true;
   postButton.textContent = "Posting...";
-  
+
+  let mediaUrl = null;
+
+  // Check for media upload
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    const storage = getStorage();
+    const mediaRef = ref(storage, 'media/' + file.name);
+    
+    // Upload media to Firebase storage
+    try {
+      await uploadBytes(mediaRef, file);
+      mediaUrl = await getDownloadURL(mediaRef);
+    } catch (e) {
+      console.error("Error uploading media: ", e);
+      alert("Failed to upload media. Try again.");
+      return;
+    }
+  }
+
   try {
-    await addDoc(collection(db, "gossips"), {
-      gossip: gossipText,
-      timestamp: new Date(),
-      reports: []
-    });
+    // Clear input fields
     document.getElementById("gossipInput").value = "";
-    loadGossips();
+    fileInput.value = "";
+    
+    loadGossips();  // Reload the gossip list
   } catch (e) {
     console.error("Error adding gossip: ", e);
     alert("Failed to post gossip. Try again.");
@@ -143,6 +183,9 @@ async function loadGossips() {
     gossipElement.innerHTML = `
       <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
       <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
+      ${gossipData.fileURL ? `<img src="${gossipData.fileURL}" style="max-width: 100%;">` : ""}
+      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">Delete</button>` : ""}
+
       <button class="save-image-btn" onclick="generateImage('gossip-${docSnapshot.id}')">
         <img src="pictures/save.png" alt="Save">
       </button>
@@ -156,6 +199,8 @@ async function loadGossips() {
         <img src="pictures/delete.png" alt="Delete">
       </button>` : ""}
       <div class="first-reply" id="first-reply-${docSnapshot.id}"></div>
+
+
     `;
 
     gossipList.appendChild(gossipElement);
@@ -188,7 +233,7 @@ async function loadFirstReply(gossipId) {
     firstReplyDiv.innerHTML = `<span class="no-reply" onclick="window.location.href='${shareableLink}'">No replies yet. Click to reply.</span>`;
   }
 }
-
+window.loadFirstReply = loadFirstReply;
 
 
 // Generate an image of a gossip element
@@ -223,12 +268,16 @@ document.addEventListener("DOMContentLoaded", () => {
   loadGossips();
 });
 function checkTOS() {
-  if (!localStorage.getItem("tosAccepted")) {
-      document.getElementById("tosModal").style.display = "block";
+  // Check if TOS has not been accepted or is stored as 'false'
+  if (localStorage.getItem("tosAccepted") !== "true") {
+      document.getElementById("tosModal").style.display = "flex"; // Show the modal
+      openTOS();  // Ensure the modal is opened
   }
 }
 
+
 function acceptTOS() {
+  // Store the acceptance in localStorage and close the modal
   localStorage.setItem("tosAccepted", "true");
   document.getElementById("tosModal").style.display = "none";
 }
@@ -243,21 +292,75 @@ window.onload = checkTOS;
 const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 const tosLink = document.getElementById("tosLink");
+const closeSidebarBtn = document.getElementById("closeSidebar");
 
 sidebarToggle.addEventListener("click", () => {
   sidebar.classList.toggle("hidden");
 });
 
-// When the ToS link is clicked, open the modal and hide the sidebar
-tosLink.addEventListener("click", () => {
-  openTOS(); // open ToS modal
-  sidebar.classList.add("hidden"); // hide sidebar
+// Close sidebar button functionality
+closeSidebarBtn.addEventListener("click", () => {
+  sidebar.classList.add("hidden");
 });
 
-// TOS functions (make sure these are globally available)
+// Ensure TOS functions are globally accessible
 window.openTOS = function openTOS() {
-  document.getElementById("tosModal").style.display = "flex";
+  document.getElementById("tosModal").style.display = "flex"; // Open the modal
 };
 window.closeTOS = function closeTOS() {
-  document.getElementById("tosModal").style.display = "none";
+  document.getElementById("tosModal").style.display = "none"; // Close the modal
 };
+// Get file input and preview container elements
+const fileInput = document.getElementById("fileInput");
+const previewContainer = document.getElementById("preview");
+
+// Listen for file input change event
+fileInput.addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  
+  // Clear any previous previews
+  previewContainer.innerHTML = "";
+
+  // If a file is selected
+  if (file) {
+    const reader = new FileReader();
+
+    // When the file is read successfully
+    reader.onload = function(e) {
+      const fileType = file.type.split("/")[0]; // Get file type (image/video)
+      const fileURL = e.target.result;
+
+      // If it's an image
+      if (fileType === "image") {
+        const img = document.createElement("img");
+        img.src = fileURL;
+        previewContainer.appendChild(img);
+      }
+
+      // If it's a video
+      else if (fileType === "video") {
+        const video = document.createElement("video");
+        video.src = fileURL;
+        video.controls = true; // Allow playback controls for video
+        previewContainer.appendChild(video);
+      }
+    };
+
+    // Read the file as a data URL
+    reader.readAsDataURL(file);
+  }
+});
+
+const darkModeToggle = document.getElementById("darkModeToggle");
+const body = document.body;
+const h1 = document.h1;
+const h2 = document.h2;
+const h3 = document.h3;
+// Listen for the dark mode button click event
+darkModeToggle.addEventListener("click", function() {
+  // Toggle the 'dark-mode' class on the body element
+  body.classList.toggle("dark-mode");
+  h1.classList.toggle("dark-mode");
+  h2.classList.toggle("dark-mode");
+  h3.classList.toggle("dark-mode");
+});
