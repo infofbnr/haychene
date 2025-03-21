@@ -222,3 +222,42 @@ document.addEventListener("DOMContentLoaded", () => {
   isAdmin = localStorage.getItem("isAdmin") === "true"; 
   loadGossips();
 });
+function checkTOS() {
+  if (!localStorage.getItem("tosAccepted")) {
+      document.getElementById("tosModal").style.display = "block";
+  }
+}
+
+function acceptTOS() {
+  localStorage.setItem("tosAccepted", "true");
+  document.getElementById("tosModal").style.display = "none";
+}
+
+// Attach function to window so the button can access it
+window.acceptTOS = acceptTOS;
+
+// Run check on page load
+window.onload = checkTOS;
+
+// Sidebar toggle functionality
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const tosLink = document.getElementById("tosLink");
+
+sidebarToggle.addEventListener("click", () => {
+  sidebar.classList.toggle("hidden");
+});
+
+// When the ToS link is clicked, open the modal and hide the sidebar
+tosLink.addEventListener("click", () => {
+  openTOS(); // open ToS modal
+  sidebar.classList.add("hidden"); // hide sidebar
+});
+
+// TOS functions (make sure these are globally available)
+window.openTOS = function openTOS() {
+  document.getElementById("tosModal").style.display = "flex";
+};
+window.closeTOS = function closeTOS() {
+  document.getElementById("tosModal").style.display = "none";
+};

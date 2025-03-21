@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hay Shor</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -10,12 +10,38 @@
 
 </head>
 <body>
+  <!-- Hamburger Toggle Button -->
+   <div id="sidebardiv">
+    <button id="sidebarToggle">☰</button>
+   </div>
+
+
+  <!-- Sidebar Menu -->
+  <nav id="sidebar" class="hidden">
+    <ul>
+      <li><a href="/">Main</a></li>
+      <li><a href="javascript:void(0)" id="tosLink">ToS</a></li>
+    </ul>
+  </nav>
   <img class=" lmao lmao2" src="hayshor.png" width="150" height="150">
   <header>
     <h1>Hayerou Shorelou Deghe</h1>
     <h3>Kidenk hayere shad g siren shorel, ouremn hos grnak shorel arants mege kidna ovek!</h3>
   </header>
-  
+  <div id="tosModal" class="modal">
+    <div class="modal-content">
+      <h2>Terms of Service</h2>
+      <p>By using this website, you agree to the following:</p>
+      <ul>
+        <p>1. The website owner is not responsible for any content posted by users.</p>
+        <p>2. You cannot contact the owner regarding gossips about yourself.</p>
+        <p>3. All posts are anonymous and irreversible.</p>
+        <p>4. Moderation actions are at the owner's discretion.</p>
+      </ul>
+      <button onclick="acceptTOS()">I Agree</button>
+    </div>
+  </div>
+
   <main>
     <textarea id="gossipInput" placeholder="Write some gossip..."></textarea>
     <button onclick="submitGossip()">Post</button>
