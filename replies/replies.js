@@ -249,3 +249,20 @@ window.submitNestedReply = submitNestedReply;
 window.toggleNestedReplyForm = toggleNestedReplyForm;
 
 document.addEventListener("DOMContentLoaded", loadGossip);
+
+function goBack() {
+  window.location.href = "https://hayshor.blog";
+}
+window.goBack = goBack;
+
+// Check localStorage for theme preference on page load
+window.addEventListener('load', () => {
+  const theme = localStorage.getItem('theme');
+  const body = document.body;
+  // If the theme is dark, apply dark mode, otherwise light mode
+  if (theme === 'dark') {
+    body.classList.add('dark-mode');
+  } else {
+    body.classList.remove('dark-mode');
+  }
+});
