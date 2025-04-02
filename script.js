@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
 import { 
-  getFirestore, collection, addDoc, getDocs,limit, updateDoc, deleteDoc, doc, query, orderBy 
+  getFirestore, collection, addDoc, getDoc,getDocs,limit, updateDoc, increment,deleteDoc, doc, query, where, orderBy 
 } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js";
 
@@ -77,13 +77,15 @@ async function submitGossip() {
     gossip: gossipText,
     fileURL: fileURL, 
     timestamp: new Date(),
-    reports: [] 
+    reports: [],
+    approved: false
   });
 
   document.getElementById("gossipInput").value = "";
+  alert("You wrote a gossip! Please wait 5-10 minutes to have it accepted. If you don't see it within 30 minutes, then it has been rejected.")
+  alert("Great, mekhk kordsetsir. hramme Asdvadsashounchen mas m garta.");
+  window.location.href = 'https://dailyverses.site';
   fileInput.value = ""; 
-  loadGossips();
-
   let mediaUrl = null;
 
   // Check for media upload
@@ -154,52 +156,77 @@ async function deleteGossip(id) {
 }
 
 // Load all gossips from Firestore sorted newest first
-async function loadGossips() {
+async function loadGossips(showAll = false) {
   const gossipList = document.getElementById("gossipList");
   gossipList.innerHTML = "";
 
-  const q = query(collection(db, "gossips"), orderBy("timestamp", "desc"));
+  // Get today's start and end timestamps
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
+  const endOfDay = startOfDay + 86400; // 86400 seconds in a day
+
+  // Fetch only approved gossips
+  const q = query(collection(db, "gossips"), where("approved", "==", true));
   const querySnapshot = await getDocs(q);
-  
-  // Use for...of to allow awaiting for the first reply query per gossip
-  for (const docSnapshot of querySnapshot.docs) {
-    const gossipData = docSnapshot.data();
+
+  console.log("Total gossips fetched:", querySnapshot.docs.length);
+
+  if (querySnapshot.empty) {
+    gossipList.innerHTML = "<p>No gossips found.</p>";
+    return;
+  }
+
+  // Convert documents to an array
+  let gossips = querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  // Filter manually if showAll is false
+  if (!showAll) {
+    gossips = gossips.filter(gossip => {
+      const gossipTimestamp = gossip.timestamp ? gossip.timestamp.seconds : 0;
+      return gossipTimestamp >= startOfDay && gossipTimestamp < endOfDay;
+    });
+  }
+
+  // Sort by timestamp (newest first)
+  gossips.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+  for (const gossipData of gossips) {
     const gossipElement = document.createElement("div");
     gossipElement.classList.add("gossip");
-    gossipElement.setAttribute("id", `gossip-${docSnapshot.id}`);
+    gossipElement.setAttribute("id", `gossip-${gossipData.id}`);
 
-    // Generate shareable link
-    const shareableLink = createShareableLink(docSnapshot.id);
+    // Create a shareable link
+    const shareableLink = createShareableLink(gossipData.id);
 
-    // Build gossip element inner HTML
     gossipElement.innerHTML = `
       <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
-      <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
+      <p class="timestamp"><em>${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}</em></p>
       ${gossipData.fileURL ? `<img src="${gossipData.fileURL}" style="max-width: 100%;">` : ""}
-      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${doc.id}')">Delete</button>` : ""}
 
-      <button class="save-image-btn" onclick="generateImage('gossip-${docSnapshot.id}')">
+      <button class="save-image-btn" onclick="generateImage('gossip-${gossipData.id}')">
         <img src="pictures/save.png" alt="Save">
       </button>
       <button class="copy-btn" onclick="copyToClipboard('${shareableLink}')">
         <img src="pictures/link.png" alt="Copy">
       </button>
-      <button class="report-btn" onclick="reportGossip('${docSnapshot.id}', ${JSON.stringify(gossipData.reports || [])})">
+      <button class="report-btn" onclick="reportGossip('${gossipData.id}', ${JSON.stringify(gossipData.reports || [])})">
         <img src="pictures/flag.png" alt="Report">
       </button>
-      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${docSnapshot.id}')">
+      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${gossipData.id}')">
         <img src="pictures/delete.png" alt="Delete">
       </button>` : ""}
-      <div class="first-reply" id="first-reply-${docSnapshot.id}"></div>
-
-
+      <div class="first-reply" id="first-reply-${gossipData.id}"></div>
     `;
 
     gossipList.appendChild(gossipElement);
-    // Load the first reply snippet for this gossip
-    loadFirstReply(docSnapshot.id);
+    loadFirstReply(gossipData.id);
   }
 }
+
+window.loadGossips = loadGossips;
 
 // Load the first reply (oldest) for a given gossip and display as clickable snippet
 async function loadFirstReply(gossipId) {
@@ -222,7 +249,7 @@ async function loadFirstReply(gossipId) {
     firstReplyDiv.innerHTML = `<span class="reply-snippet" onclick="window.location.href='${shareableLink}'">First reply: ${snippet}</span>`;
   } else {
     // Even if there are no replies, display a clickable message that directs to the replies page.
-    firstReplyDiv.innerHTML = `<span class="no-reply" onclick="window.location.href='${shareableLink}'">No replies yet. Click to reply.</span>`;
+    firstReplyDiv.innerHTML = `<span class="no-reply" onclick="window.location.href='${shareableLink}'">Click to view gossip on its own.</span>`;
   }
 }
 window.loadFirstReply = loadFirstReply;
@@ -306,34 +333,49 @@ window.closeTOS = function closeTOS() {
 
 const darkModeBtn = document.getElementById('darkModeBtn');
 const body = document.body;
-
+const filterButtons = document.querySelectorAll('.filter-buttons button');
+const button2 = document.querySelectorAll('.postbut');
 // Function to toggle dark mode
 function toggleDarkMode() {
-  // Toggle the 'dark-mode' class on the body element
+  // Toggle dark mode on the body
   body.classList.toggle('dark-mode');
-  
-  // Save the current theme to localStorage
-  if (body.classList.contains('dark-mode')) {
-    localStorage.setItem('theme', 'dark');
-  } else {
-    localStorage.setItem('theme', 'light');
-  }
+  // Update button colors manually
+  filterButtons.forEach(button => {
+    if (body.classList.contains('dark-mode')) {
+      button.style.backgroundColor = '#333';  // Dark mode color
+    } else {
+      button.style.backgroundColor = '#3498db';  // Light mode color
+    }
+  });
+  button2.forEach(button => {
+    if (body.classList.contains('dark-mode')) {
+      button.style.backgroundColor = '#333';  // Dark mode color
+    } else {
+      button.style.backgroundColor = '#3498db';  // Light mode color
+    }
+  });
+  // Save the theme preference
+  localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
 }
 
-// Check localStorage for theme preference on page load
-window.addEventListener('load', () => {
+// Apply dark mode on page load if saved
+window.addEventListener('DOMContentLoaded', () => {
   const theme = localStorage.getItem('theme');
   
-  // If the theme is dark, apply dark mode, otherwise light mode
   if (theme === 'dark') {
     body.classList.add('dark-mode');
-  } else {
-    body.classList.remove('dark-mode');
+
+    // Apply dark mode styles to buttons
+    filterButtons.forEach(button => button.style.backgroundColor = '#333');
+    button2.forEach(button => button.style.backgroundColor = '#333');
   }
 });
 
-// Add an event listener to the button to toggle dark mode
-darkModeBtn.addEventListener('click', toggleDarkMode);
+// Add an event listener to the dark mode button
+if (darkModeBtn) {
+  darkModeBtn.addEventListener('click', toggleDarkMode);
+}
+
 const fileInput = document.getElementById("fileInput");
 const previewContainer = document.getElementById("preview");
 const errorMessage = document.getElementById("errorMessage");
