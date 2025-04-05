@@ -2,79 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hay Shor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Websites</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <link rel="icon" href="hayshor.png">
-
 </head>
 <body>
-  <div style="margin-right: auto">
-    <button id="sidebarToggle">☰</button>
-  </div>
-    <div style="margin-left: auto">
-      <button id="darkModeBtn" class="dark-mode-btn">🌙</button>
-    </div>
-  <nav id="sidebar" class="hidden">
-    <button id="closeSidebar">&times;</button>
-    <ul>
-      <li><a href="/">Main</a></li>
-      <li><a href="/tos/" id="tosLink">Terms of Service</a></li>
-      <li><a href="/faq/">FAQ</a></li>
-    </ul>
-  </nav>
+  <h1>HayShor has been officially shut down.</h1>
+  <h3 style="color: red">Thank you to everyone who visited my site, supported me, even gave me ideas</h3><h3 style="color: blue;">to make the website better. After careful consideration, I have decided that the website</h3><h3 style="color: orange;"> has no purpose anymore & is not helpful or useful to anyone. For those asking, I was</h3><h3>not pressured or threatened by anyone. This was entirely my idea. Thank you.</h3><h3>Meanwhile, you can check out my other websites. They aren't exactly like HayShor,</h3><h3>but I promise you will like them too.</h3>
+  <h1>Visit My Websites</h1>
 
-  <img class=" lmao lmao2" src="hayshor.png" width="150" height="150">
-  <header>
-    <h1>Hayerou Shorelou Deghe</h1>
-    <h3>Kidenk hayere shad g siren shorel, ouremn hos grnak shorel arants mege kidna ovek!</h3>
-  </header>
-  <div id="tosModal" class="modal">
-    <div class="modal-content">
-      <h2>Terms of Service</h2>
-      <br>
-      <p>By using this website, you agree to the following:</p>
-      <br>
-      <ul>
-        <p>1. The website owner is not responsible for any content posted by users.</p>
-        <br>
-        <p>2. You cannot contact the owner regarding gossips about yourself, except for extreme cases.</p>
-        <br>
-        <p>3. All posts are anonymous and irreversible.</p>
-        <br>
-        <p>4. Moderation actions are at the owner's discretion.</p>
-        <br>
-        <p>You can read more about this <a href="/tos/">here</a></p>
-        <br>
-        <br>
-      </ul>
-      <button onclick="acceptTOS()">I Agree</button>
-    </div>
-  </div>
-
-  <main>
-    <textarea id="gossipInput" placeholder="Write some gossip..."></textarea>
-    <div class="file-upload-container">
-      <input type="file" id="fileInput" accept="image/png, image/jpeg">
-      <p id="errorMessage" style="color: red; display: none;">Only PNG and JPEG files are allowed.</p>
-
-      <label for="fileInput" class="file-label">Upload Media</label>
-      <div id="preview" class="preview-container"></div>
+  <div class="websites">
+    <div class="site-card">
+      <h2 style="color: aqua;">Daily Bible Verses</h2>
+      <a href="https://dailyverses.site" target="_blank">Visit</a>
     </div>
 
-    <button onclick="submitGossip()" id="postbtn" class="postbut">Post</button>
-    <h2 id="gossip-title">Daily Gossips</h2>
-
-    <div class="filter-buttons">
-      <button onclick="loadGossips(false)">Today's Gossips</button>
-      <button onclick="loadGossips(true)">All Time Gossips</button>
+    <div class="site-card">
+      <h2 style="color: blueviolet;">Model UN Training AI</h2>
+      <a href="https://mun-ai.pro" target="_blank">Visit</a>
     </div>
-    
-    <div id="gossipList"></div>
-    
-  </main>
 
-  <script type="module" src="script.js"></script>
+    <div class="site-card">
+      <h2 style="color: red;">Brainrot Soundboard</h2>
+      <a href="https://brain-rot.lol" target="_blank">Visit</a>
+    </div>
+    <div class="site-card fourth-card">
+      <h2 style="color: palevioletred;">Sigmagram</h2>
+      <a href="https://sigmagram.tech" target="_blank">Visit</a>
+    </div>
+</div>
+  <script src="script.js"></script>
 </body>
 </html>
