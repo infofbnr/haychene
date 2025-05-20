@@ -108,7 +108,7 @@ async function loadReplies() {
     replyElement.classList.add("reply");
     replyElement.setAttribute("gossip", `reply-${replyDoc.id}`);
     replyElement.innerHTML = `
-      <p>${replyData.reply}</p>
+      <p>Reply: ${replyData.reply}</p>
       <p class="timestamp"><em>${formatTimestamp(replyData.timestamp.seconds * 1000)}</em></p>
       <button class="nested-reply-btn" onclick="toggleNestedReplyForm('${replyDoc.id}')">Reply</button>
       <div class="nested-replies" id="nested-replies-${replyDoc.id}"></div>
@@ -160,7 +160,7 @@ async function loadNestedReplies(parentReplyId) {
     const nestedElement = document.createElement("div");
     nestedElement.classList.add("nested-reply");
     nestedElement.innerHTML = `
-      <p>${nestedData.reply}</p>
+      <p>Reply: ${nestedData.reply}</p>
       <p class="timestamp"><em>${formatTimestamp(nestedData.timestamp.seconds * 1000)}</em></p>
     `;
     nestedContainer.appendChild(nestedElement);
