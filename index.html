@@ -2,35 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HayShor Out.</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hay Shor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="icon" href="hayshor.png">
 </head>
-<body>
-  <h1>HayShor has been officially shut down.</h1>
-  <h3 style="color: red">Thank you to everyone who visited my site, supported me, even gave me ideas</h3><h3 style="color: blue;">to make the website better. After careful consideration, I have decided that the website</h3><h3 style="color: orange;"> has no purpose anymore & is not helpful or useful to anyone. For those asking, I was</h3><h3>not pressured or threatened by anyone. This was entirely my idea. Thank you.</h3><h3>Meanwhile, you can check out my other websites. They aren't exactly like HayShor,</h3><h3>but I promise you will like them too.</h3>
-  <h1>Visit My Websites</h1>
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 min-h-screen font-sans">
 
-  <div class="websites">
-    <div class="site-card">
-      <h2 style="color: aqua;">Daily Bible Verses</h2>
-      <a href="https://dailyverses.site" target="_blank">Visit</a>
+  <!-- Header Controls -->
+  <div class="flex justify-between items-center p-5 bg-gray-900 shadow-md">
+    <button id="sidebarToggle" class="text-white text-2xl hover:text-pink-500 transition">☰</button>
+  </div>
+
+  <!-- Sidebar -->
+  <nav id="sidebar" class="hidden fixed top-0 left-0 w-72 h-full bg-gray-800 border-r border-pink-500 z-50 p-6">
+    <button id="closeSidebar" class="text-white text-3xl mb-6 hover:text-red-500 transition">&times;</button>
+    <ul class="space-y-4 text-lg">
+      <li><a href="/" class="text-pink-400 hover:underline">🏠 Main</a></li>
+      <li><a href="/tos/" id="tosLink" class="text-pink-400 hover:underline">📜 Terms of Service</a></li>
+      <li><a href="/faq/" class="text-pink-400 hover:underline">❓ FAQ</a></li>
+    </ul>
+  </nav>
+
+  <!-- Logo -->
+  <div class="flex justify-center mt-8">
+    <img src="hayshor.png" alt="Hay Shor" class="w-36 h-36 rounded-full shadow-xl border-4 border-pink-500">
+  </div>
+
+  <!-- Header -->
+  <header class="text-center mt-6">
+    <h1 class="text-4xl font-extrabold tracking-wide text-pink-400">Hayerou Shorelou Deghe</h1>
+    <p class="mt-2 text-gray-400 text-sm max-w-xl mx-auto">Kidenk hayere shad g siren shorel, ouremn hos grnak shorel arants mege kidna ovek!</p>
+  </header>
+
+  <!-- TOS Modal -->
+  <div id="tosModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+    <div class="bg-gray-900 border border-pink-500 p-6 rounded-xl max-w-lg shadow-2xl text-center text-sm text-gray-200">
+      <h2 class="text-xl font-bold mb-4 text-pink-400">Terms of Service</h2>
+      <ul class="list-disc pl-6 text-left space-y-2">
+        <li>The website owner is not responsible for user content.</li>
+        <li>No contact allowed about your gossip unless extreme.</li>
+        <li>All posts are anonymous and final.</li>
+        <li>Moderation is at the owner's discretion.</li>
+        <li>We suggest you check out ToS #3 & #4 :)</li>
+      </ul>
+      <button onclick="acceptTOS()" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg">Check out the Terms of Service</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto p-6 mt-10 bg-gray-900/80 border border-gray-700 rounded-2xl shadow-lg backdrop-blur">
+    <textarea id="gossipInput" placeholder="Spill the tea anonymously..." class="w-full p-4 text-sm text-gray-100 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none resize-none h-32"></textarea>
+
+    <!-- File Upload -->
+    <div class="mt-4">
+      <input type="file" id="fileInput" accept="image/png, image/jpeg" class="hidden">
+      <label for="fileInput" class="bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer inline-block">📤 Upload Image</label>
+      <p id="errorMessage" class="text-red-400 mt-2 text-xs hidden">Only PNG and JPEG files allowed.</p>
+      <div id="preview" class="mt-4"></div>
     </div>
 
-    <div class="site-card">
-      <h2 style="color: blueviolet;">Model UN Training AI</h2>
-      <a href="https://mun-ai.pro" target="_blank">Visit</a>
+    <!-- Submit -->
+    <div class="text-center mt-6">
+      <button onclick="submitGossip()" id="postbtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg shadow-md">🚀 Post</button>
     </div>
 
-    <div class="site-card">
-      <h2 style="color: red;">Brainrot Soundboard</h2>
-      <a href="https://brain-rot.lol" target="_blank">Visit</a>
+    <!-- Gossip Feed -->
+    <h2 class="text-2xl font-bold text-pink-400 mt-10">🗣️ Latest Gossip</h2>
+    <div id="gossipList" class="mt-4 space-y-4">
+      <!-- Gossip posts will appear here -->
     </div>
-    <div class="site-card fourth-card">
-      <h2 style="color: palevioletred;">Sigmagram</h2>
-      <a href="https://sigmagram.tech" target="_blank">Visit</a>
-    </div>
-</div>
-  <script src="script.js"></script>
+  </main>
+
+  <!-- JavaScript -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>

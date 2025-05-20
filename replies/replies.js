@@ -57,24 +57,42 @@ async function loadGossip() {
   const gossipData = docSnap.data();
   const shareableLink = window.location.origin + "/replies?gossip=" + gossipId;
   
-  gossipContainer.innerHTML = `
-    <div class="gossip" id="gossip-${gossipId}">
-      <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
-      <p class="timestamp"><em>${formatTimestamp(gossipData.timestamp.seconds * 1000)}</em></p>
-      <button class="save-image-btn" onclick="generateImage('gossip-${gossipId}')">
-        <img src="../pictures/save.png" alt="Save">
-      </button>
-      <button class="copy-btn" onclick="copyToClipboard('${shareableLink}')">
-        <img src="../pictures/link.png" alt="Copy">
-      </button>
-      <button class="report-btn" onclick="reportGossip('${gossipId}', ${JSON.stringify(gossipData.reports || [])})">
-        <img src="../pictures/flag.png" alt="Report">
-      </button>
-      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${gossipId}')">
-        <img src="../pictures/delete.png" alt="Delete">
-      </button>` : ""}
-    </div>
-  `;
+    gossipContainer.innerHTML = `
+      <div id="gossip-${gossipData.id}" class="relative bg-gray-800 rounded-xl border border-pink-500 p-5 shadow-md hover:shadow-lg transition duration-200">
+
+        <!-- Top-left buttons -->
+        <div class="absolute top-3 left-3 flex gap-2">
+          <button onclick="generateImage('gossip-${gossipData.id}')" class="hover:scale-110 transition" aria-label="Save Gossip Image">
+            <img src="../pictures/save.png" alt="Save" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+          <button onclick="copyToClipboard('${shareableLink}')" class="hover:scale-110 transition" aria-label="Copy Link">
+            <img src="../pictures/link.png" alt="Copy" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+        </div>
+
+        <!-- Top-right buttons -->
+        <div class="absolute top-3 right-3 flex gap-2">
+          <button onclick="reportGossip('${gossipData.id}', ${JSON.stringify(gossipData.reports || [])})" class="hover:scale-110 transition" aria-label="Report Gossip">
+            <img src="../pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+          ${isAdmin ? `
+            <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
+              <img src="../pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
+            </button>
+          ` : ""}
+        </div>
+
+        <!-- Gossip Content -->
+        <div class="mt-8 text-gray-100">
+          <p class="text-base font-medium leading-snug">${gossipData.gossip}</p>
+          <p class="text-xs text-pink-400 mt-2 italic">
+            ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
+          </p>
+          ${gossipData.fileURL ? `<img src="${gossipData.fileURL}" class="mt-4 rounded-md max-w-full border border-pink-600">` : ""}
+          <div class="first-reply mt-4" id="first-reply-${gossipData.id}"></div>
+        </div>
+      </div>
+    `;
   loadReplies();
 }
 

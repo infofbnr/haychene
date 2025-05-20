@@ -200,26 +200,44 @@ async function loadGossips(showAll = false) {
 
     // Create a shareable link
     const shareableLink = createShareableLink(gossipData.id);
-
     gossipElement.innerHTML = `
-      <p><strong>Gossip:</strong> ${gossipData.gossip}</p>
-      <p class="timestamp"><em>${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}</em></p>
-      ${gossipData.fileURL ? `<img src="${gossipData.fileURL}" style="max-width: 100%;">` : ""}
+      <div id="gossip-${gossipData.id}" class="relative bg-gray-800 rounded-xl border border-pink-500 p-5 shadow-md hover:shadow-lg transition duration-200">
 
-      <button class="save-image-btn" onclick="generateImage('gossip-${gossipData.id}')">
-        <img src="pictures/save.png" alt="Save">
-      </button>
-      <button class="copy-btn" onclick="copyToClipboard('${shareableLink}')">
-        <img src="pictures/link.png" alt="Copy">
-      </button>
-      <button class="report-btn" onclick="reportGossip('${gossipData.id}', ${JSON.stringify(gossipData.reports || [])})">
-        <img src="pictures/flag.png" alt="Report">
-      </button>
-      ${isAdmin ? `<button class="delete-btn" onclick="deleteGossip('${gossipData.id}')">
-        <img src="pictures/delete.png" alt="Delete">
-      </button>` : ""}
-      <div class="first-reply" id="first-reply-${gossipData.id}"></div>
+        <!-- Top-left buttons -->
+        <div class="absolute top-3 left-3 flex gap-2">
+          <button onclick="generateImage('gossip-${gossipData.id}')" class="hover:scale-110 transition" aria-label="Save Gossip Image">
+            <img src="pictures/save.png" alt="Save" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+          <button onclick="copyToClipboard('${shareableLink}')" class="hover:scale-110 transition" aria-label="Copy Link">
+            <img src="pictures/link.png" alt="Copy" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+        </div>
+
+        <!-- Top-right buttons -->
+        <div class="absolute top-3 right-3 flex gap-2">
+          <button onclick="reportGossip('${gossipData.id}', ${JSON.stringify(gossipData.reports || [])})" class="hover:scale-110 transition" aria-label="Report Gossip">
+            <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+          ${isAdmin ? `
+            <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
+              <img src="pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
+            </button>
+          ` : ""}
+        </div>
+
+        <!-- Gossip Content -->
+        <div class="mt-8 text-gray-100">
+          <p class="text-base font-medium leading-snug">${gossipData.gossip}</p>
+          <p class="text-xs text-pink-400 mt-2 italic">
+            ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
+          </p>
+          ${gossipData.fileURL ? `<img src="${gossipData.fileURL}" class="mt-4 rounded-md max-w-full border border-pink-600">` : ""}
+          <div class="first-reply mt-4" id="first-reply-${gossipData.id}"></div>
+        </div>
+      </div>
     `;
+
+
 
     gossipList.appendChild(gossipElement);
     loadFirstReply(gossipData.id);
@@ -299,6 +317,7 @@ function acceptTOS() {
   // Store the acceptance in localStorage and close the modal
   localStorage.setItem("tosAccepted", "true");
   document.getElementById("tosModal").style.display = "none";
+  window.location.href = '/tos/';
 }
 
 // Attach function to window so the button can access it
@@ -329,52 +348,6 @@ window.openTOS = function openTOS() {
 window.closeTOS = function closeTOS() {
   document.getElementById("tosModal").style.display = "none"; // Close the modal
 };
-
-
-const darkModeBtn = document.getElementById('darkModeBtn');
-const body = document.body;
-const filterButtons = document.querySelectorAll('.filter-buttons button');
-const button2 = document.querySelectorAll('.postbut');
-// Function to toggle dark mode
-function toggleDarkMode() {
-  // Toggle dark mode on the body
-  body.classList.toggle('dark-mode');
-  // Update button colors manually
-  filterButtons.forEach(button => {
-    if (body.classList.contains('dark-mode')) {
-      button.style.backgroundColor = '#333';  // Dark mode color
-    } else {
-      button.style.backgroundColor = '#3498db';  // Light mode color
-    }
-  });
-  button2.forEach(button => {
-    if (body.classList.contains('dark-mode')) {
-      button.style.backgroundColor = '#333';  // Dark mode color
-    } else {
-      button.style.backgroundColor = '#3498db';  // Light mode color
-    }
-  });
-  // Save the theme preference
-  localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
-}
-
-// Apply dark mode on page load if saved
-window.addEventListener('DOMContentLoaded', () => {
-  const theme = localStorage.getItem('theme');
-  
-  if (theme === 'dark') {
-    body.classList.add('dark-mode');
-
-    // Apply dark mode styles to buttons
-    filterButtons.forEach(button => button.style.backgroundColor = '#333');
-    button2.forEach(button => button.style.backgroundColor = '#333');
-  }
-});
-
-// Add an event listener to the dark mode button
-if (darkModeBtn) {
-  darkModeBtn.addEventListener('click', toggleDarkMode);
-}
 
 const fileInput = document.getElementById("fileInput");
 const previewContainer = document.getElementById("preview");
