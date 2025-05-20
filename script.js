@@ -55,7 +55,6 @@ function copyToClipboard(text) {
 window.copyToClipboard = copyToClipboard;
 const storage = getStorage(app);
 
-// Submit a new gossip
 async function submitGossip() {
   let gossipText = document.getElementById("gossipInput").value.trim();
   let fileInput = document.getElementById("fileInput");
@@ -75,47 +74,23 @@ async function submitGossip() {
 
   await addDoc(collection(db, "gossips"), {
     gossip: gossipText,
-    fileURL: fileURL, 
+    fileURL: fileURL,
     timestamp: new Date(),
-    reports: [],
-    approved: false
+    reports: []
+    // Removed 'approved' field completely
   });
 
+  // Clear input fields and give user feedback
   document.getElementById("gossipInput").value = "";
-  alert("You wrote a gossip! Please wait 5-10 minutes to have it accepted. If you don't see it within 30 minutes, then it has been rejected.")
-  alert("Great, mekhk kordsetsir. hramme Asdvadsashounchen mas m garta.");
-  window.location.href = 'https://dailyverses.site';
-  fileInput.value = ""; 
-  let mediaUrl = null;
+  fileInput.value = "";
 
-  // Check for media upload
-  if (fileInput.files.length > 0) {
-    const file = fileInput.files[0];
-    const storage = getStorage();
-    const mediaRef = ref(storage, 'media/' + file.name);
-    
-    // Upload media to Firebase storage
-    try {
-      await uploadBytes(mediaRef, file);
-      mediaUrl = await getDownloadURL(mediaRef);
-    } catch (e) {
-      console.error("Error uploading media: ", e);
-      alert("Failed to upload media. Try again.");
-      return;
-    }
-  }
+  alert("You wrote a gossip! It will appear immediately.");
+  loadGossips();  // Make sure this loads all gossips without filtering
 
-  try {
-    // Clear input fields
-    document.getElementById("gossipInput").value = "";
-    fileInput.value = "";
-    
-    loadGossips();  // Reload the gossip list
-  } catch (e) {
-    console.error("Error adding gossip: ", e);
-    alert("Failed to post gossip. Try again.");
-  }
+  // Optional: redirect or other actions
+  // window.location.href = 'https://dailyverses.site';
 }
+
 
 // Report a gossip
 async function reportGossip(id, reports = []) {
@@ -166,7 +141,7 @@ async function loadGossips(showAll = false) {
   const endOfDay = startOfDay + 86400; // 86400 seconds in a day
 
   // Fetch only approved gossips
-  const q = query(collection(db, "gossips"), where("approved", "==", true));
+  const q = query(collection(db, "gossips"));
   const querySnapshot = await getDocs(q);
 
   console.log("Total gossips fetched:", querySnapshot.docs.length);
@@ -227,7 +202,7 @@ async function loadGossips(showAll = false) {
 
         <!-- Gossip Content -->
         <div class="mt-8 text-gray-100">
-          <p class="text-base font-medium leading-snug">${gossipData.gossip}</p>
+          <p class="text-base font-medium leading-snug">Gossip:  ${gossipData.gossip}</p>
           <p class="text-xs text-pink-400 mt-2 italic">
             ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
           </p>
