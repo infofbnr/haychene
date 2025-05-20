@@ -84,7 +84,9 @@ async function submitGossip() {
   document.getElementById("gossipInput").value = "";
   fileInput.value = "";
 
-  alert("You wrote a gossip! It will appear immediately.");
+  alert("You wrote a gossip! Please wait 5-10 minutes to have it accepted. If you don't see it within 30 minutes, then it has been rejected.")
+  alert("Great, mekhk kordsetsir. hramme Asdvadsashounchen mas m garta.");
+  window.location.href = 'https://dailyverses.site';
   loadGossips();  // Make sure this loads all gossips without filtering
 
   // Optional: redirect or other actions
