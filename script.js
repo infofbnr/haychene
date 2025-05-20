@@ -84,7 +84,6 @@ async function submitGossip() {
   document.getElementById("gossipInput").value = "";
   fileInput.value = "";
 
-  alert("You wrote a gossip! Please wait 5-10 minutes to have it accepted. If you don't see it within 30 minutes, then it has been rejected.")
   alert("Great, mekhk kordsetsir. hramme Asdvadsashounchen mas m garta.");
   window.location.href = 'https://dailyverses.site';
   loadGossips();  // Make sure this loads all gossips without filtering
@@ -244,7 +243,11 @@ async function loadFirstReply(gossipId) {
     firstReplyDiv.innerHTML = `<span class="reply-snippet" onclick="window.location.href='${shareableLink}'">First reply: ${snippet}</span>`;
   } else {
     // Even if there are no replies, display a clickable message that directs to the replies page.
-    firstReplyDiv.innerHTML = `<span class="no-reply" onclick="window.location.href='${shareableLink}'">Click to view gossip on its own.</span>`;
+firstReplyDiv.innerHTML = `<span class="no-reply" 
+  style="text-decoration: underline; user-select: none; cursor: pointer;" 
+  onclick="window.location.href='${shareableLink}'">
+  Click to view gossip on its own.
+</span>`;
   }
 }
 window.loadFirstReply = loadFirstReply;
