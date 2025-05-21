@@ -84,7 +84,7 @@ async function loadGossip() {
 
         <!-- Gossip Content -->
         <div class="mt-8 text-gray-100">
-          <p class="text-base font-medium leading-snug">${gossipData.gossip}</p>
+          <p class="text-base font-medium leading-snug">Gossip: ${gossipData.gossip}</p>
           <p class="text-xs text-pink-400 mt-2 italic">
             ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
           </p>
@@ -100,27 +100,61 @@ async function loadGossip() {
 async function loadReplies() {
   const repliesContainer = document.getElementById("repliesContainer");
   repliesContainer.innerHTML = "";
+
   const q = query(collection(db, "gossips", gossipId, "replies"), orderBy("timestamp", "desc"));
   const repliesSnapshot = await getDocs(q);
+
   repliesSnapshot.forEach((replyDoc) => {
     const replyData = replyDoc.data();
+
     const replyElement = document.createElement("div");
-    replyElement.classList.add("reply");
+replyElement.classList.add(
+  "reply-container",
+  "bg-gray-900",
+  "border",
+  "border-pink-600",
+  "rounded-xl",
+  "p-4",
+  "shadow-md",
+  "space-y-3"
+);
     replyElement.setAttribute("gossip", `reply-${replyDoc.id}`);
-    replyElement.innerHTML = `
-      <p>Reply: ${replyData.reply}</p>
-      <p class="timestamp"><em>${formatTimestamp(replyData.timestamp.seconds * 1000)}</em></p>
-      <button class="nested-reply-btn" onclick="toggleNestedReplyForm('${replyDoc.id}')">Reply</button>
-      <div class="nested-replies" id="nested-replies-${replyDoc.id}"></div>
-      <div class="nested-reply-form" id="nested-reply-form-${replyDoc.id}" style="display:none;">
-        <textarea id="nested-reply-input-${replyDoc.id}" placeholder="Write a reply to this reply..."></textarea>
-        <button onclick="submitNestedReply('${replyDoc.id}')">Submit</button>
-      </div>
-    `;
+
+replyElement.innerHTML = `
+  <div class="space-y-2">
+    <p><span class="text-pink-400 font-semibold">Reply:</span> ${replyData.reply}</p>
+    <p class="text-sm text-gray-500"><em>${formatTimestamp(replyData.timestamp.seconds * 1000)}</em></p>
+    
+    <button 
+      class="nested-reply-btn text-sm text-pink-400 hover:underline focus:outline-none"
+      onclick="toggleNestedReplyForm('${replyDoc.id}')">
+      Reply
+    </button>
+
+    <div class="nested-replies mt-3 ml-4 space-y-2" id="nested-replies-${replyDoc.id}"></div>
+
+    <div class="nested-reply-form mt-2 space-y-2 hidden" id="nested-reply-form-${replyDoc.id}">
+      <textarea 
+        id="nested-reply-input-${replyDoc.id}" 
+        placeholder="Write a reply to this reply..." 
+        class="w-full p-3 rounded-md border border-pink-600 bg-gray-950 text-gray-100 resize-none focus:outline-pink-400"
+      ></textarea>
+      <button 
+        class="bg-pink-600 hover:bg-pink-700 active:bg-pink-800 transition-colors text-white font-semibold py-2 px-4 rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-pink-400/50"
+        onclick="submitNestedReply('${replyDoc.id}')">
+        Submit
+      </button>
+    </div>
+  </div>
+`;
+
+
     repliesContainer.appendChild(replyElement);
     loadNestedReplies(replyDoc.id);
   });
 }
+
+
 
 // Toggle nested reply form for a given reply
 function toggleNestedReplyForm(replyId) {

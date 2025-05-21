@@ -240,7 +240,7 @@ async function loadFirstReply(gossipId) {
       ? replyData.reply.substring(0, 60) + "..."
       : replyData.reply;
     // Display clickable snippet with a label indicating it's the first reply
-    firstReplyDiv.innerHTML = `<span class="reply-snippet" onclick="window.location.href='${shareableLink}'">First reply: ${snippet}</span>`;
+    firstReplyDiv.innerHTML = `<span class="reply-snippet" style="text-decoration: underline; user-select: none; cursor: pointer;" onclick="window.location.href='${shareableLink}'">First reply: ${snippet}</span>`;
   } else {
     // Even if there are no replies, display a clickable message that directs to the replies page.
 firstReplyDiv.innerHTML = `<span class="no-reply" 
