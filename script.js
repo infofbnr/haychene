@@ -158,14 +158,6 @@ async function loadGossips(showAll = false) {
     ...doc.data()
   }));
 
-  // Filter manually if showAll is false
-  if (!showAll) {
-    gossips = gossips.filter(gossip => {
-      const gossipTimestamp = gossip.timestamp ? gossip.timestamp.seconds : 0;
-      return gossipTimestamp >= startOfDay && gossipTimestamp < endOfDay;
-    });
-  }
-
   // Sort by timestamp (newest first)
   gossips.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
