@@ -96,7 +96,7 @@ async function submitGossip() {
 // Report a gossip
 async function reportGossip(id) {
   const gossipRef = doc(db, "gossips", id);
-  const userID = localStorage.getItem("userID") || generateUserID();
+  const userID = generateUserID();
 
   // Get the current gossip data
   const gossipSnap = await getDoc(gossipRef);
@@ -128,12 +128,15 @@ async function reportGossip(id) {
 }
 
 
-// Generate unique user ID
 function generateUserID() {
-  const userID = "user-" + Math.random().toString(36).substr(2, 9);
-  localStorage.setItem("userID", userID);
+  let userID = localStorage.getItem("userID");
+  if (!userID) {
+    userID = "user-" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("userID", userID);
+  }
   return userID;
 }
+
 
 // Delete gossip (admin only)
 async function deleteGossip(id) {
