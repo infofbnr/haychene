@@ -94,24 +94,39 @@ async function submitGossip() {
 
 
 // Report a gossip
-async function reportGossip(id, reports = []) {
+async function reportGossip(id) {
   const gossipRef = doc(db, "gossips", id);
   const userID = localStorage.getItem("userID") || generateUserID();
 
-  if (!Array.isArray(reports)) reports = [];
+  // Get the current gossip data
+  const gossipSnap = await getDoc(gossipRef);
+  if (!gossipSnap.exists()) {
+    alert("Gossip does not exist.");
+    return;
+  }
+
+  const gossipData = gossipSnap.data();
+  let reports = gossipData.reports || [];
+
+  // Check if the user already reported
   if (reports.includes(userID)) {
     alert("You have already reported this gossip.");
     return;
   }
+
   reports.push(userID);
+
   if (reports.length >= 3) {
     await deleteDoc(gossipRef);
     alert("Gossip removed due to too many reports.");
   } else {
     await updateDoc(gossipRef, { reports });
+    alert("Gossip reported. Thank you.");
   }
+
   loadGossips();
 }
+
 
 // Generate unique user ID
 function generateUserID() {
