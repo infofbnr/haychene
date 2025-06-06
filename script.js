@@ -206,9 +206,14 @@ async function loadGossips(showAll = false) {
 
         <!-- Top-right buttons -->
         <div class="absolute top-3 right-3 flex gap-2">
-          <button onclick="reportGossip('${gossipData.id}', ${JSON.stringify(gossipData.reports || [])})" class="hover:scale-110 transition" aria-label="Report Gossip">
-            <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
-          </button>
+            <button 
+              onclick="reportGossip('${gossipData.id}')" 
+              class="hover:scale-110 transition" 
+              aria-label="Report Gossip"
+            >
+              <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
+            </button>
+
           ${isAdmin ? `
             <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
               <img src="pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
