@@ -95,6 +95,7 @@ async function submitGossip() {
 
 // Report a gossip
 async function reportGossip(id) {
+  try {
   const gossipRef = doc(db, "gossips", id);
   const userID = generateUserID();
 
@@ -123,7 +124,11 @@ async function reportGossip(id) {
     await updateDoc(gossipRef, { reports });
     alert("Gossip reported. Thank you.");
   }
-
+  }
+  catch (error) {
+    console.error("Error reporting gossip:", error);
+    alert("An error occurred while reporting the gossip.");
+  }
   loadGossips();
 }
 
