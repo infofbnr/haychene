@@ -117,7 +117,7 @@ async function reportGossip(id) {
 
   reports.push(userID);
 
-  if (reports.length >= 3) {
+  if (reports.length >= 5) {
     await deleteDoc(gossipRef);
     alert("Gossip removed due to too many reports.");
   } else {
