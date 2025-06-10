@@ -153,6 +153,14 @@ async function deleteGossip(id) {
   alert("Gossip deleted by admin.");
   loadGossips();
 }
+function getExtensionFromURL(url) {
+  if (!url) return "";
+  // Extract the substring after the last dot, ignoring query params or fragments
+  const cleanUrl = url.split('?')[0].split('#')[0];
+  const parts = cleanUrl.split('.');
+  if (parts.length === 1) return "";
+  return parts.pop().toLowerCase();
+}
 
 // Load all gossips from Firestore sorted newest first
 async function loadGossips(showAll = false) {
@@ -184,74 +192,76 @@ async function loadGossips(showAll = false) {
   // Sort by timestamp (newest first)
   gossips.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
-  for (const gossipData of gossips) {
-    const gossipElement = document.createElement("div");
-    gossipElement.classList.add("gossip");
-    gossipElement.setAttribute("id", `gossip-${gossipData.id}`);
+for (const gossipData of gossips) {
+  const gossipElement = document.createElement("div");
+  gossipElement.classList.add("gossip");
+  gossipElement.setAttribute("id", `gossip-${gossipData.id}`);
 
-    // Create a shareable link
-    const shareableLink = createShareableLink(gossipData.id);
-    gossipElement.innerHTML = `
-      <div id="gossip-${gossipData.id}" class="relative bg-gray-800 rounded-xl border border-pink-500 p-5 shadow-md hover:shadow-lg transition duration-200">
+  // Check for announcement tag
+  const isAnnouncement = gossipData.gossip.startsWith("/announcement");
 
-        <!-- Top-left buttons -->
-        <div class="absolute top-3 left-3 flex gap-2">
-          <button onclick="generateImage('gossip-${gossipData.id}')" class="hover:scale-110 transition" aria-label="Save Gossip Image">
-            <img src="pictures/save.png" alt="Save" class="w-5 h-5 opacity-80 hover:opacity-100">
-          </button>
-          <button onclick="copyToClipboard('${shareableLink}')" class="hover:scale-110 transition" aria-label="Copy Link">
-            <img src="pictures/link.png" alt="Copy" class="w-5 h-5 opacity-80 hover:opacity-100">
-          </button>
-        </div>
+  // Remove the tag from display text if announcement
+  const displayText = isAnnouncement
+    ? gossipData.gossip.replace("/announcement", "").trim()
+    : gossipData.gossip;
 
-        <!-- Top-right buttons -->
-        <div class="absolute top-3 right-3 flex gap-2">
-            <button 
-              onclick="reportGossip('${gossipData.id}')" 
-              class="hover:scale-110 transition" 
-              aria-label="Report Gossip"
-            >
-              <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
-            </button>
-
-          ${isAdmin ? `
-            <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
-              <img src="pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
-            </button>
-          ` : ""}
-        </div>
-
-        <!-- Gossip Content -->
-        <div class="mt-8 text-gray-100">
-          <p class="text-base font-medium leading-snug">Gossip:  ${gossipData.gossip}</p>
-          <p class="text-xs text-pink-400 mt-2 italic">
-            ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
-          </p>
-          ${gossipData.fileURL ? (
-  gossipData.fileURL.toLowerCase().includes(".png") ||
-  gossipData.fileURL.toLowerCase().includes(".jpg") ||
-  gossipData.fileURL.toLowerCase().includes(".jpeg")
-    ? `<img src="${gossipData.fileURL}" class="mt-4 rounded-md max-w-full border border-pink-600">`
-    : gossipData.fileURL.toLowerCase().includes(".mp4") ||
-      gossipData.fileURL.toLowerCase().includes(".webm") ||
-      gossipData.fileURL.toLowerCase().includes(".mov")
-      ? `<video controls class="mt-4 rounded-md max-w-full border border-pink-600">
-           <source src="${gossipData.fileURL}" type="video/mp4">
-           Your browser does not support the video tag.
-         </video>`
-      : ""
-) : ""}
-
-          <div class="first-reply mt-4" id="first-reply-${gossipData.id}"></div>
-        </div>
-      </div>
-    `;
-
-
-
-    gossipList.appendChild(gossipElement);
-    loadFirstReply(gossipData.id);
+  // Prepare media display (image/video) - here you can reuse the media code from before
+  // (Assuming you already have a function getExtensionFromURL and mediaHTML as I showed previously)
+  const ext = getExtensionFromURL(gossipData.fileURL || "");
+  let mediaHTML = "";
+  if (["png", "jpg", "jpeg"].includes(ext)) {
+    mediaHTML = `<img src="${gossipData.fileURL}" class="mt-4 rounded-md max-w-full border border-pink-600">`;
+  } else if (["mp4", "webm", "mov"].includes(ext)) {
+    mediaHTML = `<video controls class="mt-4 rounded-md max-w-full border border-pink-600">
+                   <source src="${gossipData.fileURL}" type="video/mp4">
+                   Your browser does not support the video tag.
+                 </video>`;
   }
+
+  gossipElement.innerHTML = `
+    <div class="relative rounded-xl border p-5 shadow-md hover:shadow-lg transition duration-200
+      ${isAnnouncement ? "bg-yellow-200 border-yellow-500 text-yellow-900" : "bg-gray-800 border-pink-500 text-gray-100"}">
+
+      <!-- Announcement badge -->
+      ${isAnnouncement ? `<div class="absolute top-3 right-3 font-bold uppercase text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">Announcement</div>` : ""}
+
+      <!-- Top-left buttons -->
+      <div class="absolute top-3 left-3 flex gap-2">
+        <button onclick="generateImage('gossip-${gossipData.id}')" class="hover:scale-110 transition" aria-label="Save Gossip Image">
+          <img src="pictures/save.png" alt="Save" class="w-5 h-5 opacity-80 hover:opacity-100">
+        </button>
+        <button onclick="copyToClipboard('${createShareableLink(gossipData.id)}')" class="hover:scale-110 transition" aria-label="Copy Link">
+          <img src="pictures/link.png" alt="Copy" class="w-5 h-5 opacity-80 hover:opacity-100">
+        </button>
+      </div>
+
+      <!-- Top-right buttons -->
+      <div class="absolute top-3 right-3 flex gap-2">
+        <button onclick="reportGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Report Gossip">
+          <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
+        </button>
+        ${isAdmin ? `
+          <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
+            <img src="pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
+          </button>
+        ` : ""}
+      </div>
+
+      <!-- Gossip Content -->
+      <div class="mt-8">
+  <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : "Gossip:"} ${displayText}</p>
+
+        <p class="text-xs mt-2 italic">${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}</p>
+        ${mediaHTML}
+        <div class="first-reply mt-4" id="first-reply-${gossipData.id}"></div>
+      </div>
+    </div>
+  `;
+
+  gossipList.appendChild(gossipElement);
+  loadFirstReply(gossipData.id);
+}
+
 }
 
 window.loadGossips = loadGossips;
@@ -427,4 +437,9 @@ fileInput.addEventListener("change", function(event) {
     };
     video.src = URL.createObjectURL(file);
   }
+});
+
+
+whatsappToggle.addEventListener("click", () => {
+  window.location.href = "https://whatsapp.com/channel/0029VbB0Q4jFSAsyMkMqu545";
 });
