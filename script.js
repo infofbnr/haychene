@@ -227,7 +227,21 @@ async function loadGossips(showAll = false) {
           <p class="text-xs text-pink-400 mt-2 italic">
             ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
           </p>
-          ${gossipData.fileURL ? `<img src="${gossipData.fileURL}" class="mt-4 rounded-md max-w-full border border-pink-600">` : ""}
+          ${gossipData.fileURL ? (
+  gossipData.fileURL.toLowerCase().includes(".png") ||
+  gossipData.fileURL.toLowerCase().includes(".jpg") ||
+  gossipData.fileURL.toLowerCase().includes(".jpeg")
+    ? `<img src="${gossipData.fileURL}" class="mt-4 rounded-md max-w-full border border-pink-600">`
+    : gossipData.fileURL.toLowerCase().includes(".mp4") ||
+      gossipData.fileURL.toLowerCase().includes(".webm") ||
+      gossipData.fileURL.toLowerCase().includes(".mov")
+      ? `<video controls class="mt-4 rounded-md max-w-full border border-pink-600">
+           <source src="${gossipData.fileURL}" type="video/mp4">
+           Your browser does not support the video tag.
+         </video>`
+      : ""
+) : ""}
+
           <div class="first-reply mt-4" id="first-reply-${gossipData.id}"></div>
         </div>
       </div>
@@ -356,34 +370,61 @@ const errorMessage = document.getElementById("errorMessage");
 // Listen for file input change event
 fileInput.addEventListener("change", function(event) {
   const file = event.target.files[0];
-
-  // Clear any previous previews and error messages
   previewContainer.innerHTML = "";
-  errorMessage.style.display = "none"; // Hide error message
+  errorMessage.style.display = "none";
 
-  // If a file is selected
   if (!file) return;
 
-  // Validate file type
-  const allowedTypes = ["image/png", "image/jpeg"];
+  const allowedTypes = ["image/png", "image/jpeg", "video/mp4", "video/webm", "video/quicktime"];
+  const maxSizeMB = 50;
+
+  // Check file type
   if (!allowedTypes.includes(file.type)) {
-    errorMessage.style.display = "block"; // Show error message
-    errorMessage.innerText = "Only PNG and JPEG images are allowed!";
-    fileInput.value = ""; // Clear invalid file selection
-    return; // Exit if the file is invalid
+    errorMessage.innerText = "Only PNG, JPEG images and short videos are allowed!";
+    errorMessage.style.display = "block";
+    fileInput.value = "";
+    return;
   }
 
-  // Preview the image
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = document.createElement("img");
-    img.src = e.target.result;
-    img.style.maxWidth = "100px"; // Limit preview size
-    img.style.maxHeight = "100px";
-    img.style.marginTop = "10px";
-    previewContainer.appendChild(img);
-  };
+  // Check file size
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    errorMessage.innerText = `File too large. Max size is ${maxSizeMB}MB.`;
+    errorMessage.style.display = "block";
+    fileInput.value = "";
+    return;
+  }
 
-  // Read the file as a data URL
-  reader.readAsDataURL(file);
+  // If it's an image
+  if (file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.style.maxWidth = "100px";
+      img.style.maxHeight = "100px";
+      img.style.marginTop = "10px";
+      previewContainer.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // If it's a video
+  if (file.type.startsWith("video/")) {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.onloadedmetadata = function() {
+      URL.revokeObjectURL(video.src);
+      const maxDuration = 20;
+      if (video.duration > maxDuration) {
+        errorMessage.innerText = `Video too long. Max duration is ${maxDuration} seconds.`;
+        errorMessage.style.display = "block";
+        fileInput.value = "";
+      } else {
+        video.controls = true;
+        video.style.maxWidth = "200px";
+        previewContainer.appendChild(video);
+      }
+    };
+    video.src = URL.createObjectURL(file);
+  }
 });
