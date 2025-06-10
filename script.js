@@ -113,34 +113,34 @@ async function submitGossip() {
 // Report a gossip
 async function reportGossip(id) {
   try {
-  const gossipRef = doc(db, "gossips", id);
-  const userID = generateUserID();
+    const gossipRef = doc(db, "gossips", id);
+    const userID = generateUserID();
 
-  // Get the current gossip data
-  const gossipSnap = await getDoc(gossipRef);
-  if (!gossipSnap.exists()) {
-    alert("Gossip does not exist.");
-    return;
-  }
+    // Get the current gossip data
+    const gossipSnap = await getDoc(gossipRef);
+    if (!gossipSnap.exists()) {
+      alert("Gossip does not exist.");
+      return;
+    }
 
-  const gossipData = gossipSnap.data();
-  let reports = gossipData.reports || [];
+    const gossipData = gossipSnap.data();
+    let reports = gossipData.reports || [];
 
-  // Check if the user already reported
-  if (reports.includes(userID)) {
-    alert("You have already reported this gossip.");
-    return;
-  }
+    // Check if the user already reported
+    if (reports.includes(userID)) {
+      alert("You have already reported this gossip.");
+      return;
+    }
 
-  reports.push(userID);
+    reports.push(userID);
 
-  if (reports.length >= 5) {
-    await deleteDoc(gossipRef);
-    alert("Gossip removed due to too many reports.");
-  } else {
-    await updateDoc(gossipRef, { reports });
-    alert("Gossip reported. Thank you.");
-  }
+    if (reports.length >= 5) {
+      await deleteDoc(gossipRef);
+      alert("Gossip removed due to too many reports.");
+    } else {
+      await updateDoc(gossipRef, { reports });
+      alert("Gossip reported. Thank you.");
+    }
   }
   catch (error) {
     console.error("Error reporting gossip:", error);
@@ -189,7 +189,7 @@ async function loadGossips(showAll = false) {
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
   const endOfDay = startOfDay + 86400; // 86400 seconds in a day
 
-  // Fetch only approved gossips
+  // Fetch all gossips
   const q = query(collection(db, "gossips"));
   const querySnapshot = await getDocs(q);
 
@@ -207,35 +207,37 @@ async function loadGossips(showAll = false) {
   }));
 
   // Sort by timestamp (newest first)
-// Sort by timestamp (newest first)
-gossips.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+  gossips.sort((a, b) => {
+    // Use Firestore Timestamp if present, else fallback to Date
+    const aTime = a.timestamp?.seconds ? a.timestamp.seconds : (a.timestamp instanceof Date ? a.timestamp.getTime() / 1000 : 0);
+    const bTime = b.timestamp?.seconds ? b.timestamp.seconds : (b.timestamp instanceof Date ? b.timestamp.getTime() / 1000 : 0);
+    return bTime - aTime;
+  });
 
-// Find the announcement gossip (there should be only one)
-const announcement = gossips.find(g => g.gossip.startsWith("/announcement"));
+  // Find the announcement gossip (should be only one, by isAnnouncement flag)
+  const announcement = gossips.find(g => g.isAnnouncement);
 
-// Filter out the announcement from the rest
-const regularGossips = gossips.filter(g => !g.gossip.startsWith("/announcement"));
+  // Filter out the announcement from the rest
+  const regularGossips = gossips.filter(g => !g.isAnnouncement);
 
-// Clear list before rendering
-gossipList.innerHTML = "";
+  // Clear list before rendering
+  gossipList.innerHTML = "";
 
-// Render announcement first if exists
-if (announcement) {
-  const el = createGossipElement(announcement, true);
-  gossipList.appendChild(el);
-}
+  // Render announcement first if exists
+  if (announcement) {
+    const el = createGossipElement(announcement, true);
+    gossipList.appendChild(el);
+  }
 
-// Then render regular gossips
-for (const gossipData of regularGossips) {
-  const el = createGossipElement(gossipData, false);
-  gossipList.appendChild(el);
-}
+  // Then render regular gossips
+  for (const gossipData of regularGossips) {
+    const el = createGossipElement(gossipData, false);
+    gossipList.appendChild(el);
+  }
 
-// Then load first replies for all
-if (announcement) loadFirstReply(announcement.id);
-regularGossips.forEach(g => loadFirstReply(g.id));
-  gossipList.appendChild(gossipElement);
-  loadFirstReply(gossipData.id);
+  // Then load first replies for all
+  if (announcement) loadFirstReply(announcement.id);
+  regularGossips.forEach(g => loadFirstReply(g.id));
 }
 function createGossipElement(gossipData, isAnnouncement) {
   const gossipElement = document.createElement("div");
@@ -244,7 +246,7 @@ function createGossipElement(gossipData, isAnnouncement) {
 
   // Remove announcement tag from display text if announcement
   const displayText = isAnnouncement
-    ? gossipData.gossip.replace("/announcement", "").trim()
+    ? gossipData.gossip.trim()
     : gossipData.gossip;
 
   const ext = getExtensionFromURL(gossipData.fileURL || "");
@@ -291,7 +293,7 @@ function createGossipElement(gossipData, isAnnouncement) {
       <div class="mt-8">
         <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : "Gossip:"} ${displayText}</p>
 
-        <p class="text-xs mt-2 italic">${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}</p>
+        <p class="text-xs mt-2 italic">${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds ? gossipData.timestamp.seconds * 1000 : gossipData.timestamp) : "No timestamp"}</p>
         ${mediaHTML}
         <div class="first-reply mt-4" id="first-reply-${gossipData.id}"></div>
       </div>
@@ -300,8 +302,6 @@ function createGossipElement(gossipData, isAnnouncement) {
 
   return gossipElement;
 }
-
-
 
 window.loadGossips = loadGossips;
 
