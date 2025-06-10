@@ -66,13 +66,17 @@ async function submitGossip() {
   }
 
   let isAnnouncement = false;
+  let isPoll = false;
   let gossipText = gossipInput;
 
   if (gossipInput.startsWith("/announcement")) {
     isAnnouncement = true;
     gossipText = gossipInput.replace(/^\/announcement\s*/, ""); // Remove tag from stored text
   }
-
+  if (gossipInput.startsWith("/poll")) {
+    isPoll = true;
+    gossipText = gossipInput.replace(/^\/poll\s*/, ""); // Remove tag from stored text
+  }
   let fileURL = "";
   if (file) {
     const storageRef = ref(storage, `uploads/${file.name}`);
@@ -97,7 +101,8 @@ async function submitGossip() {
     fileURL,
     timestamp: new Date(),
     reports: [],
-    isAnnouncement
+    isAnnouncement,
+    isPoll
   });
 
   // Clear inputs and reload
@@ -216,7 +221,7 @@ async function loadGossips(showAll = false) {
 
   // Find the announcement gossip (should be only one, by isAnnouncement flag)
   const announcement = gossips.find(g => g.isAnnouncement);
-
+  const poll = gossips.find(g => g.isPoll);
   // Filter out the announcement from the rest
   const regularGossips = gossips.filter(g => !g.isAnnouncement);
 
@@ -225,13 +230,16 @@ async function loadGossips(showAll = false) {
 
   // Render announcement first if exists
   if (announcement) {
-    const el = createGossipElement(announcement, true);
+    const el = createGossipElement(announcement, true,false);
     gossipList.appendChild(el);
   }
-
+  if (poll) {
+    const el = createGossipElement(poll, false,true);
+    gossipList.appendChild(el);
+  }
   // Then render regular gossips
   for (const gossipData of regularGossips) {
-    const el = createGossipElement(gossipData, false);
+    const el = createGossipElement(gossipData, false,false);
     gossipList.appendChild(el);
   }
 
@@ -239,15 +247,13 @@ async function loadGossips(showAll = false) {
   if (announcement) loadFirstReply(announcement.id);
   regularGossips.forEach(g => loadFirstReply(g.id));
 }
-function createGossipElement(gossipData, isAnnouncement) {
+function createGossipElement(gossipData, isAnnouncement, isPoll) {
   const gossipElement = document.createElement("div");
   gossipElement.classList.add("gossip");
   gossipElement.setAttribute("id", `gossip-${gossipData.id}`);
 
   // Remove announcement tag from display text if announcement
-  const displayText = isAnnouncement
-    ? gossipData.gossip.trim()
-    : gossipData.gossip;
+const displayText = gossipData.gossip.trim();
 
   const ext = getExtensionFromURL(gossipData.fileURL || "");
   let mediaHTML = "";
@@ -261,11 +267,29 @@ function createGossipElement(gossipData, isAnnouncement) {
   }
 
   gossipElement.innerHTML = `
-    <div class="relative rounded-xl border p-5 shadow-md hover:shadow-lg transition duration-200
-      ${isAnnouncement ? "bg-yellow-200 border-yellow-500 text-yellow-900" : "bg-gray-800 border-pink-500 text-gray-100"}">
+<div class="relative rounded-xl border p-5 shadow-md hover:shadow-lg transition duration-200
+  ${
+    isAnnouncement
+      ? "bg-yellow-200 border-yellow-500 text-yellow-900"
+      : isPoll
+      ? "bg-blue-200 border-blue-500 text-blue-900"
+      : "bg-gray-800 border-pink-500 text-gray-100"
+  }">
 
-      <!-- Announcement badge -->
-      ${isAnnouncement ? `<div class="absolute top-3 right-3 font-bold uppercase text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">Announcement</div>` : ""}
+  <!-- Announcement badge -->
+  ${
+    isAnnouncement
+      ? `<div class="absolute top-3 right-3 font-bold uppercase text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">Announcement</div>`
+      : ""
+  }
+
+  <!-- Poll badge -->
+  ${
+    isPoll
+      ? `<div class="absolute top-3 right-3 font-bold uppercase text-xs bg-blue-400 text-blue-900 px-2 py-1 rounded">Poll</div>`
+      : ""
+  }
+
 
       <!-- Top-left buttons -->
       <div class="absolute top-3 left-3 flex gap-2">
@@ -277,21 +301,25 @@ function createGossipElement(gossipData, isAnnouncement) {
         </button>
       </div>
 
-      <!-- Top-right buttons -->
-      <div class="absolute top-3 right-3 flex gap-2">
-        <button onclick="reportGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Report Gossip">
-          <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
-        </button>
-        ${isAdmin ? `
-          <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
-            <img src="pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
-          </button>
-        ` : ""}
-      </div>
+<!-- Top-right buttons -->
+<div class="absolute top-3 right-3 flex gap-2">
+  ${!isAnnouncement && !isPoll ? `
+    <button onclick="reportGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Report Gossip">
+      <img src="pictures/flag.png" alt="Report" class="w-5 h-5 opacity-80 hover:opacity-100">
+    </button>
+  ` : ""}
+
+  ${isAdmin ? `
+    <button onclick="deleteGossip('${gossipData.id}')" class="hover:scale-110 transition" aria-label="Delete Gossip">
+      <img src="pictures/delete.png" alt="Delete" class="w-5 h-5 opacity-80 hover:opacity-100">
+    </button>
+  ` : ""}
+</div>
+
 
       <!-- Gossip Content -->
       <div class="mt-8">
-        <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : "Gossip:"} ${displayText}</p>
+        <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : isPoll ? "Poll: " : "Gossip:"} ${displayText}</p>
 
         <p class="text-xs mt-2 italic">${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds ? gossipData.timestamp.seconds * 1000 : gossipData.timestamp) : "No timestamp"}</p>
         ${mediaHTML}
