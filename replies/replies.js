@@ -56,10 +56,16 @@ async function loadGossip() {
   
   const gossipData = docSnap.data();
   const shareableLink = window.location.origin + "/replies?gossip=" + gossipId;
-  
+  const isAnnouncement = gossipData.gossip.startsWith("/announcement");
+  const displayText = isAnnouncement 
+  ? gossipData.gossip.replace("/announcement", "").trim() 
+  : gossipData.gossip;
     gossipContainer.innerHTML = `
-      <div id="gossip-${gossipData.id}" class="relative bg-gray-800 rounded-xl border border-pink-500 p-5 shadow-md hover:shadow-lg transition duration-200">
+    <div class="relative rounded-xl border p-5 shadow-md hover:shadow-lg transition duration-200
+      ${isAnnouncement ? "bg-yellow-200 border-yellow-500 text-yellow-900" : "bg-gray-800 border-pink-500 text-gray-100"}">
 
+      <!-- Announcement badge -->
+      ${isAnnouncement ? `<div class="absolute top-3 right-3 font-bold uppercase text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">Announcement</div>` : ""}
         <!-- Top-left buttons -->
         <div class="absolute top-3 left-3 flex gap-2">
           <button onclick="generateImage('gossip-${gossipData.id}')" class="hover:scale-110 transition" aria-label="Save Gossip Image">
@@ -83,8 +89,8 @@ async function loadGossip() {
         </div>
 
         <!-- Gossip Content -->
-        <div class="mt-8 text-gray-100">
-          <p class="text-base font-medium leading-snug">Gossip: ${gossipData.gossip}</p>
+        <div class="mt-8">
+  <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : "Gossip:"} ${displayText}</p>
           <p class="text-xs text-pink-400 mt-2 italic">
             ${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}
           </p>

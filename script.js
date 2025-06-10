@@ -56,13 +56,21 @@ window.copyToClipboard = copyToClipboard;
 const storage = getStorage(app);
 
 async function submitGossip() {
-  let gossipText = document.getElementById("gossipInput").value.trim();
-  let fileInput = document.getElementById("fileInput");
-  let file = fileInput.files[0]; 
+  const gossipInput = document.getElementById("gossipInput").value.trim();
+  const fileInput = document.getElementById("fileInput");
+  const file = fileInput.files[0];
 
-  if (!gossipText && !file) {
+  if (!gossipInput && !file) {
     alert("Please write something or upload a file!");
     return;
+  }
+
+  let isAnnouncement = false;
+  let gossipText = gossipInput;
+
+  if (gossipInput.startsWith("/announcement")) {
+    isAnnouncement = true;
+    gossipText = gossipInput.replace(/^\/announcement\s*/, ""); // Remove tag from stored text
   }
 
   let fileURL = "";
@@ -72,24 +80,33 @@ async function submitGossip() {
     fileURL = await getDownloadURL(snapshot.ref);
   }
 
+  // If this is an announcement, delete existing announcements first
+  if (isAnnouncement) {
+    const q = query(collection(db, "gossips"), where("isAnnouncement", "==", true));
+    const querySnapshot = await getDocs(q);
+    const batchDeletes = [];
+    querySnapshot.forEach(docSnap => {
+      batchDeletes.push(deleteDoc(doc(db, "gossips", docSnap.id)));
+    });
+    await Promise.all(batchDeletes);
+  }
+
+  // Add the new gossip document
   await addDoc(collection(db, "gossips"), {
     gossip: gossipText,
-    fileURL: fileURL,
+    fileURL,
     timestamp: new Date(),
-    reports: []
-    // Removed 'approved' field completely
+    reports: [],
+    isAnnouncement
   });
 
-  // Clear input fields and give user feedback
+  // Clear inputs and reload
   document.getElementById("gossipInput").value = "";
   fileInput.value = "";
 
   alert("Great, mekhk kordsetsir. hramme Asdvadsashounchen mas m garta.");
   window.location.href = 'https://dailyverses.site';
-  loadGossips();  // Make sure this loads all gossips without filtering
-
-  // Optional: redirect or other actions
-  // window.location.href = 'https://dailyverses.site';
+  loadGossips();
 }
 
 
@@ -190,23 +207,46 @@ async function loadGossips(showAll = false) {
   }));
 
   // Sort by timestamp (newest first)
-  gossips.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+// Sort by timestamp (newest first)
+gossips.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
-for (const gossipData of gossips) {
+// Find the announcement gossip (there should be only one)
+const announcement = gossips.find(g => g.gossip.startsWith("/announcement"));
+
+// Filter out the announcement from the rest
+const regularGossips = gossips.filter(g => !g.gossip.startsWith("/announcement"));
+
+// Clear list before rendering
+gossipList.innerHTML = "";
+
+// Render announcement first if exists
+if (announcement) {
+  const el = createGossipElement(announcement, true);
+  gossipList.appendChild(el);
+}
+
+// Then render regular gossips
+for (const gossipData of regularGossips) {
+  const el = createGossipElement(gossipData, false);
+  gossipList.appendChild(el);
+}
+
+// Then load first replies for all
+if (announcement) loadFirstReply(announcement.id);
+regularGossips.forEach(g => loadFirstReply(g.id));
+  gossipList.appendChild(gossipElement);
+  loadFirstReply(gossipData.id);
+}
+function createGossipElement(gossipData, isAnnouncement) {
   const gossipElement = document.createElement("div");
   gossipElement.classList.add("gossip");
   gossipElement.setAttribute("id", `gossip-${gossipData.id}`);
 
-  // Check for announcement tag
-  const isAnnouncement = gossipData.gossip.startsWith("/announcement");
-
-  // Remove the tag from display text if announcement
+  // Remove announcement tag from display text if announcement
   const displayText = isAnnouncement
     ? gossipData.gossip.replace("/announcement", "").trim()
     : gossipData.gossip;
 
-  // Prepare media display (image/video) - here you can reuse the media code from before
-  // (Assuming you already have a function getExtensionFromURL and mediaHTML as I showed previously)
   const ext = getExtensionFromURL(gossipData.fileURL || "");
   let mediaHTML = "";
   if (["png", "jpg", "jpeg"].includes(ext)) {
@@ -249,7 +289,7 @@ for (const gossipData of gossips) {
 
       <!-- Gossip Content -->
       <div class="mt-8">
-  <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : "Gossip:"} ${displayText}</p>
+        <p class="text-base font-medium leading-snug">${isAnnouncement ? "Announcement:" : "Gossip:"} ${displayText}</p>
 
         <p class="text-xs mt-2 italic">${gossipData.timestamp ? formatTimestamp(gossipData.timestamp.seconds * 1000) : "No timestamp"}</p>
         ${mediaHTML}
@@ -258,11 +298,10 @@ for (const gossipData of gossips) {
     </div>
   `;
 
-  gossipList.appendChild(gossipElement);
-  loadFirstReply(gossipData.id);
+  return gossipElement;
 }
 
-}
+
 
 window.loadGossips = loadGossips;
 
@@ -443,3 +482,4 @@ fileInput.addEventListener("change", function(event) {
 whatsappToggle.addEventListener("click", () => {
   window.location.href = "https://whatsapp.com/channel/0029VbB0Q4jFSAsyMkMqu545";
 });
+
