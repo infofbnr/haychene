@@ -33,48 +33,35 @@
 
   <!-- Header -->
   <header class="text-center mt-6">
-    <h1 class="text-4xl font-extrabold tracking-wide text-pink-400">Hayerou Shorelou Deghe</h1>
-    <p class="mt-2 text-gray-400 text-sm max-w-xl mx-auto">Kidenk hayere shad g siren shorel, ouremn hos grnak shorel arants mege kidna ovek!</p>
+    <h1 class="text-4xl font-extrabold tracking-wide text-pink-400">Hayerou Khoselou Deghe</h1>
+    <p class="mt-2 text-gray-400 text-sm max-w-xl mx-auto">Kidenk hayere shad g siren khosil, ouremn hos grnak khosil arants mege kidna ovek!</p>
   </header>
 
-  <!-- TOS Modal -->
-  <div id="tosModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
-    <div class="bg-gray-900 border border-pink-500 p-6 rounded-xl max-w-lg shadow-2xl text-center text-sm text-gray-200">
-      <h2 class="text-xl font-bold mb-4 text-pink-400">Terms of Service</h2>
-      <ul class="list-disc pl-6 text-left space-y-2">
-        <li>The website owner is not responsible for user content.</li>
-        <li>No contact allowed about your gossip unless extreme.</li>
-        <li>All posts are anonymous and final.</li>
-        <li>Moderation is at the owner's discretion.</li>
-        <li>We suggest you check out ToS #3 & #4 :)</li>
-      </ul>
-      <button onclick="acceptTOS()" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg">Check out the Terms of Service</button>
-    </div>
-  </div>
-
   <!-- Main Content -->
-  <main class="max-w-3xl mx-auto p-6 mt-10 bg-gray-900/80 border border-gray-700 rounded-2xl shadow-lg backdrop-blur">
-    <textarea id="gossipInput" placeholder="Spill the tea anonymously..." class="w-full p-4 text-sm text-gray-100 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none resize-none h-32"></textarea>
+  <!-- Chat Box -->
+<main class="max-w-3xl mx-auto p-6 mt-10 bg-gray-900/80 border border-gray-700 rounded-2xl shadow-lg backdrop-blur">
 
-    <!-- File Upload -->
-    <div class="mt-4">
-      <input type="file" id="fileInput" accept="image/png, image/jpeg, video/mp4, video/quicktime" class="hidden">
-      <label for="fileInput" class="bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer inline-block">📤 Upload Media</label>
-      <p id="errorMessage" class="text-red-400 mt-2 text-xs hidden">Only PNG and JPEG files allowed.</p>
-      <div id="preview" class="mt-4"></div>
-    </div>
+  <h2 class="text-2xl font-bold text-pink-400 mb-4">💬 Anonymous Chat</h2>
 
-    <!-- Submit -->
-    <div class="text-center mt-6">
-      <button onclick="submitGossip()" id="postbtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg shadow-md">🚀 Post</button>
-    </div>
+  <!-- Chat Messages -->
+  <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto px-2 py-4 bg-gray-800 rounded-lg border border-gray-700">
+    <!-- Messages will appear here -->
+  </div>
+<div id="replyIndicator" class="text-sm text-pink-400 mb-1" style="display:none;"></div>
 
-    <!-- Gossip Feed -->
-    <h2 class="text-2xl font-bold text-pink-400 mt-10">🗣️ Latest Gossip</h2>
-    <div id="gossipList" class="mt-4 space-y-4">
-      <!-- Gossip posts will appear here -->
-    </div>
-  </main>
+  <!-- Chat Input -->
+  <div class="flex gap-2">
+    <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500">
+    <button onclick="submitMessage()" class="bg-pink-600 hover:bg-pink-700 text-white font-bold px-6 rounded-lg">Send</button>
+  </div>
+<div id="voiceControls" class="my-4 flex items-center gap-4">
+  <button id="recordBtn" class="bg-pink-600 text-white px-4 py-2 rounded">🎙️ Start Recording</button>
+  <audio id="audioPreview" controls class="hidden w-48"></audio>
+  <button id="sendAudioBtn" class="bg-green-600 text-white px-4 py-2 rounded hidden">Send Voice</button>
+</div>
+
+</main>
+
 
   <!-- JavaScript -->
   <script type="module" src="script.js"></script>
