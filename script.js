@@ -93,12 +93,68 @@ sendAudioBtn.addEventListener("click", async () => {
   loadMessages();
 });
 
+const sendBtn = document.getElementById("sendBtn"); // Make sure your send button has id="sendBtn"
+const chatInput = document.getElementById("chatInput");
+
+function getCooldownEnd() {
+  return Number(localStorage.getItem("chatCooldownEnd")) || 0;
+}
+
+function setCooldownEnd(timestamp) {
+  localStorage.setItem("chatCooldownEnd", timestamp.toString());
+}
+
+function startCooldown(seconds = 60) {
+  const cooldownEnd = Date.now() + seconds * 1000;
+  setCooldownEnd(cooldownEnd);
+
+  sendBtn.disabled = true;
+  chatInput.disabled = true;
+
+  updateCooldownUI();
+}
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const closeSidebarBtn = document.getElementById("closeSidebar");
+
+sidebarToggle.addEventListener("click", () => {
+  sidebar.classList.toggle("hidden");
+});
+
+// Close sidebar button functionality
+closeSidebarBtn.addEventListener("click", () => {
+  sidebar.classList.add("hidden");
+});
+function updateCooldownUI() {
+  const cooldownEnd = getCooldownEnd();
+  const now = Date.now();
+  const remaining = Math.ceil((cooldownEnd - now) / 1000);
+
+  if (remaining > 0) {
+    sendBtn.textContent = `Wait ${remaining}s`;
+    sendBtn.disabled = true;
+    chatInput.disabled = true;
+
+    setTimeout(updateCooldownUI, 1000);
+  } else {
+    sendBtn.textContent = "Send";
+    sendBtn.disabled = false;
+    chatInput.disabled = false;
+  }
+}
+
 async function submitMessage() {
-  const input = document.getElementById("chatInput");
-  const text = input.value.trim();
+  const text = chatInput.value.trim();
 
   if (!text) {
     alert("Please type a message.");
+    return;
+  }
+
+  // Check cooldown before sending
+  const cooldownEnd = getCooldownEnd();
+  if (Date.now() < cooldownEnd) {
+    alert("Please wait before sending another message.");
     return;
   }
 
@@ -109,11 +165,18 @@ async function submitMessage() {
     parentID: replyingTo // null or message id
   });
 
-  input.value = "";
+  chatInput.value = "";
   replyingTo = null;
   updateReplyUI();
   await loadMessages();
+
+  startCooldown(60);
 }
+
+// On page load, check if cooldown active and update UI accordingly
+window.addEventListener("load", updateCooldownUI);
+
+
 window.submitMessage = submitMessage;
 
 function updateReplyUI() {
@@ -258,3 +321,4 @@ document.getElementById("whatsappToggle").addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", () => {
   loadMessages();
 });
+
