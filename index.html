@@ -4,65 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hay Shor</title>
-  <meta name="google-adsense-account" content="ca-pub-3792925504821588">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link rel="icon" href="hayshor.png">
 </head>
-<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-gray-100 min-h-screen font-sans">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-slate-200 min-h-screen font-sans">
 
   <!-- Header Controls -->
-  <div class="flex justify-between items-center p-5 bg-gray-900 shadow-md">
-    <button id="sidebarToggle" class="text-white text-2xl hover:text-pink-500 transition">☰</button>
-    <button id="whatsappToggle" class="w-10 h-8 opacity-80 hover:opacity-100"><img src="pictures/logo.png"></button>
+  <div class="flex justify-between items-center p-5 bg-slate-900 shadow-md">
+    <button id="sidebarToggle" class="text-teal-400 text-2xl hover:text-teal-300 transition">☰</button>
+    <button id="whatsappToggle" class="w-10 h-8 opacity-80 hover:opacity-100"><img src="pictures/logo.png" alt="Logo"></button>
   </div>
 
   <!-- Sidebar -->
-  <nav id="sidebar" class="hidden fixed top-0 left-0 w-72 h-full bg-gray-800 border-r border-pink-500 z-50 p-6">
-    <button id="closeSidebar" class="text-white text-3xl mb-6 hover:text-red-500 transition">&times;</button>
+  <nav id="sidebar" class="hidden fixed top-0 left-0 w-72 h-full bg-slate-800 border-r border-teal-500 z-50 p-6">
+    <button id="closeSidebar" class="text-teal-400 text-3xl mb-6 hover:text-red-500 transition">&times;</button>
     <ul class="space-y-4 text-lg">
-      <li><a href="/" class="text-pink-400 hover:underline">🏠 Main</a></li>
-      <li><a href="/tos/" id="tosLink" class="text-pink-400 hover:underline">📜 Terms of Service</a></li>
-      <li><a href="/faq/" class="text-pink-400 hover:underline">❓ FAQ</a></li>
+      <li><a href="/" class="text-teal-400 hover:underline">🏠 Main</a></li>
+      <li><a href="/tos/" id="tosLink" class="text-teal-400 hover:underline">📜 Terms of Service</a></li>
+      <li><a href="/faq/" class="text-teal-400 hover:underline">❓ FAQ</a></li>
     </ul>
   </nav>
 
   <!-- Logo -->
   <div class="flex justify-center mt-8">
-    <img src="hayshor.png" alt="Hay Shor" class="w-36 h-36 rounded-full shadow-xl border-4 border-pink-500">
+    <img src="hayshor.png" alt="Hay Shor" class="w-36 h-36 rounded-full shadow-xl border-4 border-teal-500">
   </div>
 
   <!-- Header -->
   <header class="text-center mt-6">
-    <h1 class="text-4xl font-extrabold tracking-wide text-pink-400">Hayerou Khoselou Deghe</h1>
-    <p class="mt-2 text-gray-400 text-sm max-w-xl mx-auto">Kidenk hayere shad g siren khosil, ouremn hos grnak khosil arants mege kidna ovek!</p>
+    <h1 class="text-4xl font-extrabold tracking-wide text-teal-400">Hayerou Khoselou Deghe</h1>
+    <p class="mt-2 text-slate-400 text-sm max-w-xl mx-auto">Kidenk hayere shad g siren khosil, ouremn hos grnak khosil arants mege kidna ovek!</p>
   </header>
 
   <!-- Main Content -->
-  <!-- Chat Box -->
-<main class="max-w-3xl mx-auto p-6 mt-10 bg-gray-900/80 border border-gray-700 rounded-2xl shadow-lg backdrop-blur">
+  <main class="max-w-3xl mx-auto p-6 mt-10 bg-slate-900/80 border border-teal-500 rounded-2xl shadow-lg backdrop-blur">
 
-  <h2 class="text-2xl font-bold text-pink-400 mb-4">💬 Anonymous Chat</h2>
+    <h2 class="text-2xl font-bold text-teal-400 mb-4">💬 Anonymous Chat</h2>
 
-  <!-- Chat Messages -->
-  <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto px-2 py-4 bg-gray-800 rounded-lg border border-gray-700">
-    <!-- Messages will appear here -->
-  </div>
-<div id="replyIndicator" class="text-sm text-pink-400 mb-1" style="display:none;"></div>
+    <!-- Chat Messages -->
+    <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto px-2 py-4 bg-slate-800 rounded-lg border border-teal-500">
+      <!-- Messages will appear here -->
+    </div>
+    <div id="replyIndicator" class="text-sm text-teal-400 mb-1" style="display:none;"></div>
 
-  <!-- Chat Input -->
-  <div class="flex gap-2">
-    <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500">
-    <button onclick="submitMessage()" class="bg-pink-600 hover:bg-pink-700 text-white font-bold px-6 rounded-lg">Send</button>
-  </div>
-<div id="voiceControls" class="my-4 flex items-center gap-4">
-  <button id="recordBtn" class="bg-pink-600 text-white px-4 py-2 rounded">🎙️ Start Recording</button>
-  <audio id="audioPreview" controls class="hidden w-48"></audio>
-  <button id="sendAudioBtn" class="bg-green-600 text-white px-4 py-2 rounded hidden">Send Voice</button>
-</div>
+    <!-- Chat Input -->
+    <div class="flex gap-2">
+      <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 p-3 rounded-lg bg-slate-700 text-slate-200 border border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400">
+      <button onclick="submitMessage()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 rounded-lg">Send</button>
+    </div>
 
-</main>
+    <div id="voiceControls" class="my-4 flex items-center gap-4">
+      <button id="recordBtn" class="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition">🎙️ Start Recording</button>
+      <audio id="audioPreview" controls class="hidden w-48 rounded bg-slate-700"></audio>
+      <button id="sendAudioBtn" class="bg-green-600 text-white px-4 py-2 rounded hidden hover:bg-green-700 transition">Send Voice</button>
+    </div>
 
+  </main>
 
   <!-- JavaScript -->
   <script type="module" src="script.js"></script>
