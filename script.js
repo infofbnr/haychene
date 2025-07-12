@@ -104,7 +104,7 @@ function setCooldownEnd(timestamp) {
   localStorage.setItem("chatCooldownEnd", timestamp.toString());
 }
 
-function startCooldown(seconds = 60) {
+function startCooldown(seconds = 30) {
   const cooldownEnd = Date.now() + seconds * 1000;
   setCooldownEnd(cooldownEnd);
 
@@ -170,7 +170,7 @@ async function submitMessage() {
   updateReplyUI();
   await loadMessages();
 
-  startCooldown(60);
+  startCooldown(30);
 }
 
 // On page load, check if cooldown active and update UI accordingly
@@ -192,16 +192,17 @@ function updateReplyUI() {
 }
 function renderMessage(msg, list, indent = 0) {
   const div = document.createElement("div");
-  div.className = "bg-gray-800 border border-pink-500 p-4 rounded-xl shadow-md mb-2 flex justify-between items-start";
+div.className = "bg-gray-800 border border-teal-500 p-4 rounded-xl shadow-md mb-2 flex justify-between items-start";
   div.style.marginLeft = `${indent * 20}px`;
 
   const contentDiv = document.createElement("div");
   contentDiv.innerHTML = `
-    <p class="text-sm text-pink-400">ID: ${msg.userID}</p>
+    <p class="text-sm text-teal-400">ID: ${msg.userID}</p>
     <p class="text-base mt-1 text-white">${escapeHTML(msg.message)}</p>
     <p class="text-xs text-gray-500 mt-2 italic">${formatTimestamp(msg.timestamp)}</p>
-    <button class="text-pink-400 text-sm mt-2 hover:underline reply-btn" data-id="${msg.id}">Reply</button>
+    <button class="text-teal-400 text-sm mt-2 hover:underline reply-btn" data-id="${msg.id}">Reply</button>
   `;
+
 
   contentDiv.querySelector(".reply-btn").addEventListener("click", () => {
     replyingTo = msg.id;
