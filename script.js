@@ -247,10 +247,12 @@ window.renderMessage = renderMessage;
 
 async function loadMessages() {
   const list = document.getElementById("chatMessages");
+  if (!list) return;
 
   list.innerHTML = "";
 
-  const q = query(collection(db, "chats"), orderBy("timestamp", "asc"));
+  // Order by timestamp descending
+  const q = query(collection(db, "chats"), orderBy("timestamp", "desc"));
   const snapshot = await getDocs(q);
 
   const messagesById = {};
@@ -271,6 +273,7 @@ async function loadMessages() {
     }
   }
 
+  // Render messages newest first
   rootMessages.forEach(msg => renderMessage(msg, list));
 }
 
